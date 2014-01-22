@@ -131,7 +131,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getBirth() {
-		return getValue("BIRT", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT").equals(YesNo.YES.value);
+		return YesNo.YES.value.equals(getValue("BIRT", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT"));
 	}
 	
 	/**
@@ -178,7 +178,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getDeath() {
-		return getValue("DEAT", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT").equals(YesNo.YES.value);
+		return YesNo.YES.value.equals(getValue("DEAT", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT"));
 	}
 	
 	/**
