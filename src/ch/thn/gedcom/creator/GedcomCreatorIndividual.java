@@ -49,6 +49,16 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @param store
+	 * @param node
+	 */
+	public GedcomCreatorIndividual(GedcomStore store, GedcomNode node) {
+		super(store, "INDIVIDUAL_RECORD", node);
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getId() {
@@ -83,7 +93,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSex() {
-		return getValue("SEX", 0);
+		return getValue("SEX", 0, "SEX");
 	}
 	
 	/**
@@ -121,7 +131,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getBirth() {
-		return getValue("BIRT", 0).equals(YesNo.YES.value);
+		return getValue("BIRT", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT").equals(YesNo.YES.value);
 	}
 	
 	/**
@@ -130,7 +140,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getBirthDate() {
-		return getValue("BIRT-DATE", 0);
+		return getValue("BIRT-DATE", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 
 	/**
@@ -168,7 +178,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getDeath() {
-		return getValue("DEAT", 0).equals(YesNo.YES.value);
+		return getValue("DEAT", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT").equals(YesNo.YES.value);
 	}
 	
 	/**
@@ -177,7 +187,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getDeathDate() {
-		return getValue("DEAT-DATE", 0);
+		return getValue("DEAT-DATE", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -208,7 +218,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getOccupation() {
-		return getValue("OCCU", 0);
+		return getValue("OCCU", 0, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU");
 	}
 	
 	/**
@@ -239,7 +249,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getEducation() {
-		return getValue("EDUC", 0);
+		return getValue("EDUC", 0, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC");
 	}
 	
 	/**
@@ -333,7 +343,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getName(int index) {
-		return getValue("NAME", index);
+		return getValue("NAME", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME");
 	}
 	
 	/**
@@ -343,7 +353,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGivenName(int index) {
-		return getValue("GIVN", index);
+		return getValue("GIVN", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "GIVN");
 	}
 	
 	/**
@@ -353,7 +363,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSurname(int index) {
-		return getValue("SURN", index);
+		return getValue("SURN", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "SURN");
 	}
 	
 	/**
@@ -363,7 +373,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getNameType(int index) {
-		return getValue("NAME-TYPE", index);
+		return getValue("NAME-TYPE", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
 	}
 	
 	/**
@@ -372,7 +382,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfNames() {
-		return getNumberOfLines("NAME");
+		return getNumberOfLines("PERSONAL_NAME_STRUCTURE");
 	}
 	
 	/**
@@ -401,6 +411,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		if (country != null) s.add(country.replaceAll(",", ""));
 		String addrString = GedcomFormatter.makeStringList(s, ", ", null, null, true, "", false).toString();
 		
+		int numberOfAddresses = getNumberOfAddresses();
+		
 		GedcomNode addr = createPathEnd("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI", "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
 
 		try {
@@ -428,8 +440,6 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 					"CTRY", 
 					country, 
 					followPathCreate(line1.node, "CTRY"));
-			
-			int numberOfAddresses = getNumberOfLines("ADDR");
 			
 			Line[] line7 = createMultiValueLine(phone, "PHON", numberOfAddresses, addr, "PHON");
 			Line[] line8 = createMultiValueLine(email, "EMAIL", numberOfAddresses, addr, "EMAIL");
@@ -499,7 +509,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getAddress(int index) {
-		return getValue("ADDR", index);
+		return getValue("ADDR", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
 	}
 	
 	/**
@@ -509,7 +519,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getStreet1(int index) {
-		return getValue("ADR1", index);
+		return getValue("ADR1", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR1");
 	}
 	
 	/**
@@ -519,7 +529,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getStreet2(int index) {
-		return getValue("ADR2", index);
+		return getValue("ADR2", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR2");
 	}
 	
 	/**
@@ -529,7 +539,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCity(int index) {
-		return getValue("CITY", index);
+		return getValue("CITY", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CITY");
 	}
 	
 	/**
@@ -539,7 +549,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getPost(int index) {
-		return getValue("POST", index);
+		return getValue("POST", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "POST");
 	}
 	
 	/**
@@ -549,7 +559,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCountry(int index) {
-		return getValue("CTRY", index);
+		return getValue("CTRY", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CTRY");
 	}
 	
 	/**
@@ -558,7 +568,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfAddresses() {
-		return getNumberOfLines("ADDR");
+		return getNumberOfLines("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI");
 	}
 	
 	/**
@@ -569,7 +579,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getPhone(int index, int phoneIndex) {
-		return getValue("PHON" + index, phoneIndex);
+		return getValue("PHON" + index, phoneIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "PHON" + GedcomNode.PATH_OPTION_DELIMITER + phoneIndex);
 	}
 	
 	/**
@@ -579,18 +589,18 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfPhones(int index) {
-		return getNumberOfLines("PHON" + index);
+		return getNumberOfLines("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "PHON");
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param index
-	 * @param emailIndex
+	 * @param index Index of address structure
+	 * @param emailIndex Index of e-mail within address structure
 	 * @return
 	 */
 	public String getEMail(int index, int emailIndex) {
-		return getValue("EMAIL" + index, emailIndex);
+		return getValue("EMAIL" + index, emailIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
 	}
 	
 	/**
@@ -600,7 +610,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfEMails(int index) {
-		return getNumberOfLines("EMAIL" + index);
+		return getNumberOfLines("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL");
 	}
 	
 	/**
@@ -611,7 +621,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getFax(int index, int faxIndex) {
-		return getValue("FAX" + index, faxIndex);
+		return getValue("FAX" + index, faxIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "FAX" + GedcomNode.PATH_OPTION_DELIMITER + faxIndex);
 	}
 	
 	/**
@@ -621,7 +631,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfFax(int index) {
-		return getNumberOfLines("FAX" + index);
+		return getNumberOfLines("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "FAX");
 	}
 	
 	/**
@@ -632,7 +642,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getWebsite(int index, int wwwIndex) {
-		return getValue("WWW" + index, wwwIndex);
+		return getValue("WWW" + index, wwwIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
 	}
 	
 	/**
@@ -642,7 +652,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfWebsites(int index) {
-		return getNumberOfLines("WWW" + index);
+		return getNumberOfLines("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW");
 	}
 	
 	/**
@@ -685,7 +695,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSpouseLink(int index) {
-		return getXRef("FAMS", index);
+		return getXRef("FAMS", index, "SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
 	
@@ -696,7 +706,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfSpouseLinks() {
-		return getNumberOfLines("FAMS");
+		return getNumberOfLines("SPOUSE_TO_FAMILY_LINK");
 	}
 	
 	/**
@@ -739,7 +749,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getChildLink(int index) {
-		return getXRef("FAMC", index);
+		return getXRef("FAMC", index, "CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
 	}
 	
 	/**
@@ -749,7 +759,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public int getNumberOfChildLinks() {
-		return getNumberOfLines("FAMC");
+		return getNumberOfLines("CHILD_TO_FAMILY_LINK");
 	}
 	
 }

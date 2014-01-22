@@ -20,6 +20,7 @@ import java.util.Date;
 
 import ch.thn.gedcom.GedcomFormatter;
 import ch.thn.gedcom.data.GedcomError;
+import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -37,6 +38,16 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	public GedcomCreatorHeader(GedcomStore store) {
 		super(store, "HEADER", "HEAD");
 				
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param store
+	 * @param node
+	 */
+	public GedcomCreatorHeader(GedcomStore store, GedcomNode node) {
+		super(store, "HEADER", node);
 	}
 	
 	/**
@@ -99,7 +110,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSource() {
-		return getValue("SOUR", 0);
+		return getValue("SOUR", 0, "SOUR");
 	}
 	
 	/**
@@ -108,7 +119,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getName() {
-		return getValue("NAME", 0);
+		return getValue("NAME", 0, "SOUR", "NAME");
 	}
 	
 	/**
@@ -117,7 +128,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCoorporation() {
-		return getValue("CORP", 0);
+		return getValue("CORP", 0, "SOUR", "CORP");
 	}
 	
 	/**
@@ -153,7 +164,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getTransmissionDate() {
-		return getValue("DATE", 0);
+		return getValue("DATE", 0, "DATE");
 	}
 	
 	/**
@@ -162,7 +173,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getTransmissionTime() {
-		return getValue("TIME", 0);
+		return getValue("TIME", 0, "DATE", "TIME");
 	}
 	
 	/**
@@ -194,7 +205,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String setSubmitterRecordLink() {
-		return getXRef("SUBM", 0);
+		return getXRef("SUBM", 0, "SUBM");
 	}
 	
 	/**
@@ -232,7 +243,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGedcomVersion() {
-		return getValue("VERS", 0);
+		return getValue("VERS", 0, "GEDC", "VERS");
 	}
 	
 	/**
@@ -241,7 +252,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGedcomForm() {
-		return getValue("FORM", 0);
+		return getValue("FORM", 0, "GEDC", "FORM");
 	}
 	
 	/**
@@ -273,7 +284,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCharacterSet() {
-		return getValue("CHAR", 0);
+		return getValue("CHAR", 0, "CHAR");
 	}
 	
 	/**
@@ -305,7 +316,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getLanguage() {
-		return getValue("LANG", 0);
+		return getValue("LANG", 0, "LANG");
 	}
 	
 

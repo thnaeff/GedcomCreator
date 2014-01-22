@@ -17,6 +17,7 @@
 package ch.thn.gedcom.creator;
 
 import ch.thn.gedcom.data.GedcomError;
+import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -37,6 +38,16 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 		
 		addLines(new XRefLine("SUBM", id, followPathCreate()));
 			
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param store
+	 * @param node
+	 */
+	public GedcomCreatorSubmitter(GedcomStore store, GedcomNode node) {
+		super(store, "SUBMITTER_RECORD", node);
 	}
 	
 	/**
@@ -68,7 +79,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSubmitterName() {
-		return getValue("NAME", 0);
+		return getValue("NAME", 0, "NAME");
 	}
 
 }

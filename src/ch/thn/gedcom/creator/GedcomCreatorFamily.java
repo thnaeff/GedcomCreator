@@ -21,6 +21,7 @@ import java.util.Date;
 import ch.thn.gedcom.GedcomFormatter;
 import ch.thn.gedcom.creator.GedcomCreatorEnums.YesNo;
 import ch.thn.gedcom.data.GedcomError;
+import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -41,6 +42,16 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 		
 		addLines(new XRefLine("FAM", id, followPathCreate()));
 		
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param store
+	 * @param node
+	 */
+	public GedcomCreatorFamily(GedcomStore store, GedcomNode node) {
+		super(store, "FAM_RECORD", node);
 	}
 	
 	/**
@@ -80,7 +91,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getHusbandLink() {
-		return getXRef("HUSB", 0);
+		return getXRef("HUSB", 0, "HUSB");
 	}
 	
 	/**
@@ -111,7 +122,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getWifeLink() {
-		return getXRef("WIFE", 0);
+		return getXRef("WIFE", 0, "WIFE");
 	}
 	
 	/**
@@ -153,7 +164,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getChildLink(int index) {
-		return getXRef("CHIL", index);
+		return getXRef("CHIL", index, "CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
 	}
 	
 	/**
@@ -200,7 +211,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getMarriage() {
-		return getValue("MARR", 0).equals(YesNo.YES.value);
+		return getValue("MARR", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR").equals(YesNo.YES.value);
 	}
 	
 	/**
@@ -209,7 +220,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getMarriageDate() {
-		return getValue("MARR-DATE", 0);
+		return getValue("MARR-DATE", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -240,7 +251,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getDivorced() {
-		return getValue("DIV", 0).equals(YesNo.YES.value);
+		return getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV").equals(YesNo.YES.value);
 	}
 	
 

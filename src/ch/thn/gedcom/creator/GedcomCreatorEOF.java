@@ -18,6 +18,7 @@ package ch.thn.gedcom.creator;
 
 import java.util.Date;
 
+import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -36,6 +37,16 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 		super(store, "END_OF_FILE");
 		
 		followPathCreate("TRLR").forcePrint(true);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param store
+	 * @param node
+	 */
+	public GedcomCreatorEOF(GedcomStore store, GedcomNode node) {
+		super(store, "END_OF_FILE", node);
 	}
 	
 	/**
