@@ -211,7 +211,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getMarriage() {
-		return getValue("MARR", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR").equals(YesNo.YES.value);
+		return YesNo.YES.value.equals(getValue("MARR", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
 	}
 	
 	/**
@@ -251,7 +251,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getDivorced() {
-		return getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV").equals(YesNo.YES.value);
+		return YesNo.YES.value.equals(getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
 	}
 	
 
