@@ -337,7 +337,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * name = last name = family name = surname<br>
+	 * Family name = surname (at least in western context -> http://en.wikipedia.org/wiki/Family_name)
 	 * 
 	 * @param index
 	 * @return
@@ -347,7 +348,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * given name = first name = forename
 	 * 
 	 * @param index
 	 * @return
@@ -357,7 +358,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * surname = family name = name = last name<br>
+	 * Family name = surname (at least in western context -> http://en.wikipedia.org/wiki/Family_name)
 	 * 
 	 * @param index
 	 * @return
