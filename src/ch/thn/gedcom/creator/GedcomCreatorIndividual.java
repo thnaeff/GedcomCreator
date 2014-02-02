@@ -279,7 +279,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 			Line line1 = new ValueLine(
 					"NAME", 
 					firstNamesString + " /" + name + "/", 
-					followPathCreate("PERSONAL_NAME_STRUCTURE", "NAME"));
+					createPath("PERSONAL_NAME_STRUCTURE", "NAME"));
 			Line line2 = new ValueLine(
 					"GIVN", 
 					firstNamesString, 
@@ -291,7 +291,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 			Line line4 = new ValueLine(
 					"NAME-TYPE", 
 					nameType.value, 
-					followPathCreate(line1.node, "TYPE"));
+					createPath(line1.node, "TYPE"));
 			
 			return addLines(line1, line2, line3, line4);
 		} catch (GedcomError e) {
@@ -415,33 +415,33 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		
 		int numberOfAddresses = getNumberOfAddresses();
 		
-		GedcomNode addr = createPathEnd("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI", "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		GedcomNode addr = createPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI", "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
 
 		try {
 			Line line1 = new ValueLine(
 					"ADDR", 
 					addrString, 
-					followPathCreate(addr, "ADDR"));
+					createPath(addr, "ADDR"));
 			Line line2 = new ValueLine(
 					"ADR1", 
 					street1, 
-					followPathCreate(line1.node, "ADR1"));
+					createPath(line1.node, "ADR1"));
 			Line line3 = new ValueLine(
 					"ADR2", 
 					street2, 
-					followPathCreate(line1.node, "ADR2"));
+					createPath(line1.node, "ADR2"));
 			Line line4 = new ValueLine(
 					"CITY", 
 					city, 
-					followPathCreate(line1.node, "CITY"));
+					createPath(line1.node, "CITY"));
 			Line line5 = new ValueLine(
 					"POST", 
 					post, 
-					followPathCreate(line1.node, "POST"));
+					createPath(line1.node, "POST"));
 			Line line6 = new ValueLine(
 					"CTRY", 
 					country, 
-					followPathCreate(line1.node, "CTRY"));
+					createPath(line1.node, "CTRY"));
 			
 			Line[] line7 = createMultiValueLine(phone, "PHON", numberOfAddresses, addr, "PHON");
 			Line[] line8 = createMultiValueLine(email, "EMAIL", numberOfAddresses, addr, "EMAIL");
@@ -668,7 +668,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 			Line line1 = new XRefLine(
 					"FAMS", 
 					familyId, 
-					createPathEnd("SPOUSE_TO_FAMILY_LINK", "FAMS"));
+					createPath("SPOUSE_TO_FAMILY_LINK", "FAMS"));
 			
 			return addLines(line1);
 		} catch (GedcomError e) {

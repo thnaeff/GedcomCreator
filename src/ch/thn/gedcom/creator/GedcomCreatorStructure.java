@@ -38,6 +38,7 @@ public abstract class GedcomCreatorStructure {
 	
 	public static final int FALSE = -1;
 	
+	private GedcomTree tree = null;
 	protected GedcomNode node = null;
 	
 	private HashMap<String, LinkedHashSet<GedcomNode>> nodesHash = null;
@@ -53,10 +54,11 @@ public abstract class GedcomCreatorStructure {
 	 */
 	public GedcomCreatorStructure(GedcomStore store, String structureName, String... basePath) {
 		
-		GedcomTree t = store.getGedcomTree(structureName);
-		t.addMandatoryChildLines(true);
+		tree = store.getGedcomTree(structureName);
+		//Do not add mandatory lines. Just create them when needed
+		//t.addMandatoryChildLines(true);
 		
-		node = t.followPath(basePath);
+		node = tree.followPathCreate(basePath);
 				
 		nodesHash = new HashMap<String, LinkedHashSet<GedcomNode>>();
 		nodesList = new HashMap<String, LinkedList<GedcomNode>>();
@@ -413,6 +415,15 @@ public abstract class GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public GedcomTree getHeadNode() {
+		return tree;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public GedcomNode getNode() {
 		return node;
 	}
@@ -466,6 +477,34 @@ public abstract class GedcomCreatorStructure {
 	protected GedcomNode createPathEnd(GedcomNode o, String... path) {
 		try {
 			return o.createPathEnd(path);
+		} catch (GedcomError e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Creates a new path
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected GedcomNode createPath(String... path) {
+		return createPath(node, path);
+	}
+	
+	/**
+	 * Creates a new path
+	 * 
+	 * @param block
+	 * @param createNew
+	 * @param path
+	 * @return
+	 */
+	protected GedcomNode createPath(GedcomNode o, String... path) {
+		try {
+			return o.createPath(path);
 		} catch (GedcomError e) {
 			e.printStackTrace();
 		}

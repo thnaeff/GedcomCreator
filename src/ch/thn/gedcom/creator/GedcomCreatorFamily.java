@@ -136,7 +136,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 			Line line1 = new XRefLine(
 					"CHIL", 
 					childId, 
-					createPathEnd("CHIL"));
+					createPath("CHIL"));
 			return setLines(line1);
 		} catch (GedcomError e) {
 			throw e;
@@ -227,10 +227,19 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param divorced
+	 * @param marriageDate
 	 * @return
 	 */
-	public boolean setDivorced(boolean divorced) {
-		if (setValue("DIV", null)) {
+	public boolean setDivorced(boolean divorced, Date divorcedDate) {
+		if (!divorced) {
+			return true;
+		}
+		
+		//TODO what if divorces has been set to true earlier and now to false? 
+		//-> DIV tag should be removed
+		
+		if (setValue("DIV", null)
+				&& setValue("DIV-DATE", GedcomFormatter.getDate(divorcedDate))) {
 			return true;
 		}
 		
@@ -238,8 +247,12 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 			Line line1 = new EmptyLine(
 					"DIV", 
 					followPathCreate("FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
+			Line line2 = new ValueLine(
+					"DIV-DATE", 
+					GedcomFormatter.getDate(divorcedDate), 
+					followPathCreate(line1.node, "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE"));
 			
-			return setLines(line1);
+			return setLines(line1, line2);
 		} catch (GedcomError e) {
 			throw e;
 		}
@@ -251,7 +264,20 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean getDivorced() {
-		return YesNo.YES.value.equals(getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
+		//Since the DIV tag does not have a value field, just check if the tag is there
+		return (followPath("FAMILY_EVENT_STRUCTURE;DIV", "DIV") != null);
+		
+		//Y/null value
+//		return YesNo.YES.value.equals(getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getDivorceDate() {
+		return getValue("DIV-DATE", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 

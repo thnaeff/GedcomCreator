@@ -78,7 +78,7 @@ public class GedcomCreatorTest {
 		fam.addChildLink("3");
 		fam.addChildLink("4");
 		fam.setMarried(true, new Date());
-		fam.setDivorced(true);
+		fam.setDivorced(true, null);
 		
 		fam.addNote("A Family Note");
 		fam.setChangeDate(new Date());
