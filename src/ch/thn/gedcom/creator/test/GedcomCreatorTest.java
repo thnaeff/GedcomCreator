@@ -68,7 +68,9 @@ public class GedcomCreatorTest {
 		indi.addNote("Another Note");
 		indi.setChangeDate(new Date());
 		
-		System.out.println(indi.getNode().print(new GedcomStructureTextPrinter()));
+		GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
+		
+		System.out.println(textPrinter.print(indi.getNode()));
 		
 		System.out.println("------");
 		
@@ -82,7 +84,7 @@ public class GedcomCreatorTest {
 		
 		fam.addNote("A Family Note");
 		fam.setChangeDate(new Date());
-		System.out.println(fam.getNode().print(new GedcomStructureTextPrinter()));
+		System.out.println(textPrinter.print(fam.getNode()));
 		
 	}
 
