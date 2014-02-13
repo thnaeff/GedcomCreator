@@ -407,7 +407,7 @@ public abstract class GedcomCreatorStructure {
 	 * @return
 	 */
 	protected GedcomTagLine getLine(String key, int index) {
-		return nodesList.get(key).get(index).getNodeValue().getAsTagLine();
+		return nodesList.get(key).get(index).getNodeLine().getAsTagLine();
 	}
 	
 	/**
