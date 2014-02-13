@@ -20,7 +20,7 @@ GedcomStore store = new GedcomStore();
 store.showParsingOutput(false);
 
 try {
-	store.parse("PATH_TO_FILE/GedcomNodes_5.5.1.gedg");
+	store.parse("PATH_TO_FILE/gedcomobjects_5.5.1.gedg");
 } catch (GedcomParseException e) {
 	e.printStackTrace();
 }
