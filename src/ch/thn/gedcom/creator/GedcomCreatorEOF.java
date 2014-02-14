@@ -16,8 +16,6 @@
  */
 package ch.thn.gedcom.creator;
 
-import java.util.Date;
-
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -36,7 +34,7 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	public GedcomCreatorEOF(GedcomStore store) {
 		super(store, "END_OF_FILE");
 		
-		followPathCreate("TRLR").forcePrint(true);
+		apply(new GedcomDataEmpty(false, "TRLR"));
 	}
 	
 	/**
@@ -54,7 +52,7 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	 * 
 	 */
 	@Override
-	public boolean setChangeDate(Date changeDate) {
+	public boolean setChangeDate(String changeDate, String changeTime) {
 		throw new UnsupportedOperationException("No change date available in END_OF_FILE.");
 	}
 	

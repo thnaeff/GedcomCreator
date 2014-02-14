@@ -16,10 +16,6 @@
  */
 package ch.thn.gedcom.creator;
 
-import java.util.Date;
-
-import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.data.GedcomError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -55,7 +51,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 */
 	@Override
-	public boolean setChangeDate(Date changeDate) {
+	public boolean setChangeDate(String changeDate, String changeTime) {
 		throw new UnsupportedOperationException("No change date available in HEADER. Use transmission date instead.");
 	}
 	
@@ -78,30 +74,17 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSource(String systemId, String productName, String businessName) {
-		if (setValue("SOUR", systemId) 
-				&& setValue("NAME", productName)
-				&& setValue("CORP", businessName)) {
-			return true;
-		}
+		GedcomValue sour = new GedcomValue(false, systemId, 
+				"SOUR");
 		
-		try {
-			Line line1 = new ValueLine(
-					"SOUR", 
-					systemId, 
-					followPathCreate("SOUR"));
-			Line line2 = new ValueLine(
-					"NAME", 
-					productName, 
-					followPathCreate(line1.node, "NAME"));
-			Line line3 = new ValueLine(
-					"CORP", 
-					businessName, 
-					followPathCreate(line1.node, "CORP"));
-			
-			return setLines(line1, line2, line3);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue name = new GedcomValue(false, productName, sour, 
+				"NAME");
+		
+		GedcomValue corp = new GedcomValue(false, businessName, sour, 
+				"CORP");
+		
+		
+		return apply(sour, name, corp);
 	}
 	
 	/**
@@ -110,7 +93,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSource() {
-		return getValue("SOUR", 0, "SOUR");
+		return getValue("SOUR");
 	}
 	
 	/**
@@ -119,7 +102,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getName() {
-		return getValue("NAME", 0, "SOUR", "NAME");
+		return getValue("SOUR", "NAME");
 	}
 	
 	/**
@@ -128,34 +111,24 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCoorporation() {
-		return getValue("CORP", 0, "SOUR", "CORP");
+		return getValue("SOUR", "CORP");
 	}
 	
 	/**
 	 * 
 	 * 
 	 * @param transmissionDate
+	 * @param transmissionTime
 	 * @return
 	 */
-	public boolean setTransmissionDate(Date transmissionDate) {
-		if (setValue("DATE", GedcomFormatter.getDate(transmissionDate)) 
-				&& setValue("TIME", GedcomFormatter.getTime(transmissionDate))) {
-			return true;
-		}
+	public boolean setTransmissionDate(String transmissionDate, String transmissionTime) {
+		GedcomValue date = new GedcomValue(false, transmissionDate, 
+				"DATE");
 		
-		try {
-			Line line1 = new ValueLine(
-					"DATE", 
-					GedcomFormatter.getDate(transmissionDate), 
-					followPathCreate("DATE"));
-			Line line2 = new ValueLine(
-					"TIME", 
-					GedcomFormatter.getTime(transmissionDate), 
-					followPathCreate(line1.node, "TIME"));
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue time = new GedcomValue(false, transmissionTime, date, 
+				"TIME");
+		
+		return apply(date, time);
 	}
 	
 	/**
@@ -164,7 +137,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getTransmissionDate() {
-		return getValue("DATE", 0, "DATE");
+		return getValue("DATE");
 	}
 	
 	/**
@@ -173,7 +146,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getTransmissionTime() {
-		return getValue("TIME", 0, "DATE", "TIME");
+		return getValue("DATE", "TIME");
 	}
 	
 	/**
@@ -183,20 +156,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSubmitterRecordLink(String submitterRecordId) {
-		if (setXRef("SUBM", submitterRecordId)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new XRefLine(
-					"SUBM", 
-					submitterRecordId, 
-					followPathCreate("SUBM"));
-			
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(false, submitterRecordId, "SUBM"));
 	}
 	
 	/**
@@ -205,7 +165,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String setSubmitterRecordLink() {
-		return getXRef("SUBM", 0, "SUBM");
+		return getXRef("SUBM");
 	}
 	
 	/**
@@ -216,25 +176,13 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setGedcomInfo(String gedcomVersion, String gedcomForm) {
-		if (setValue("VERS", gedcomVersion) 
-				&& setValue("FORM", gedcomForm)) {
-			return true;
-		}
+		GedcomValue version = new GedcomValue(false, gedcomVersion, 
+				"GEDC", "VERS");
 		
-		try {
-			Line line1 = new ValueLine(
-					"VERS", 
-					gedcomVersion, 
-					followPathCreate("GEDC", "VERS"));
-			Line line2 = new ValueLine(
-					"FORM", 
-					gedcomForm, 
-					followPathCreate("GEDC", "FORM"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue form = new GedcomValue(false, gedcomForm, 
+				"GEDC", "FORM");
+		
+		return apply(version, form);
 	}
 	
 	/**
@@ -243,7 +191,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGedcomVersion() {
-		return getValue("VERS", 0, "GEDC", "VERS");
+		return getValue("GEDC", "VERS");
 	}
 	
 	/**
@@ -252,7 +200,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGedcomForm() {
-		return getValue("FORM", 0, "GEDC", "FORM");
+		return getValue("GEDC", "FORM");
 	}
 	
 	/**
@@ -262,20 +210,8 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setCharacterSet(String characterSet) {
-		if (setValue("CHAR", characterSet)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new ValueLine(
-					"CHAR", 
-					characterSet, 
-					followPathCreate("CHAR"));
-			
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomValue(false, characterSet, 
+				"CHAR"));
 	}
 	
 	/**
@@ -284,7 +220,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCharacterSet() {
-		return getValue("CHAR", 0, "CHAR");
+		return getValue("CHAR");
 	}
 	
 	/**
@@ -294,20 +230,8 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setLanguage(String language) {
-		if (setValue("LANG", language)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new ValueLine(
-					"LANG", 
-					language, 
-					followPathCreate("LANG"));
-			
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomValue(false, language, 
+				"LANG"));
 	}
 	
 	/**
@@ -316,7 +240,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getLanguage() {
-		return getValue("LANG", 0, "LANG");
+		return getValue("LANG");
 	}
 	
 

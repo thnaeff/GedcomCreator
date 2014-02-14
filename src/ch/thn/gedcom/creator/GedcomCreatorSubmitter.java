@@ -16,9 +16,9 @@
  */
 package ch.thn.gedcom.creator;
 
-import ch.thn.gedcom.data.GedcomError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
+
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
@@ -36,8 +36,11 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	public GedcomCreatorSubmitter(GedcomStore store, String id) {
 		super(store, "SUBMITTER_RECORD", "SUBM");
 		
-		addLines(new XRefLine("SUBM", id, followPathCreate()));
-			
+		if (!setId(id)) {
+			throw new GedcomCreatorError("Failed to create submitter record with ID " + 
+					id + ". Id could not be set.");
+		}
+		
 	}
 	
 	/**
@@ -53,24 +56,32 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean setId(String id) {
+		return apply(new GedcomXRef(false, id));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getId() {
+		return getXRef();
+	}
+	
+	
+	
+	/**
+	 * 
+	 * 
 	 * @param name
 	 * @return
 	 */
 	public boolean setSubmitterName(String name) {
-		if (setValue("NAME", name)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new ValueLine(
-					"NAME", 
-					name, 
-					followPathCreate("NAME"));
-			
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomValue(false, name, "NAME"));
 	}
 	
 	/**
@@ -79,7 +90,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSubmitterName() {
-		return getValue("NAME", 0, "NAME");
+		return getValue("NAME");
 	}
 
 }

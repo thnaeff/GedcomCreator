@@ -16,11 +16,7 @@
  */
 package ch.thn.gedcom.creator;
 
-import java.util.Date;
-
-import ch.thn.gedcom.GedcomFormatter;
 import ch.thn.gedcom.creator.GedcomCreatorEnums.YesNo;
-import ch.thn.gedcom.data.GedcomError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -40,8 +36,10 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	public GedcomCreatorFamily(GedcomStore store, String id) {
 		super(store, "FAM_RECORD", "FAM");
 		
-		addLines(new XRefLine("FAM", id, followPathCreate()));
-		
+		if (!setId(id)) {
+			throw new GedcomCreatorError("Failed to create family with ID " + 
+					id + ". Id could not be set.");
+		}		
 	}
 	
 	/**
@@ -57,10 +55,11 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @param id
 	 * @return
 	 */
-	public String getId() {
-		return getXRef("FAM", 0);
+	public boolean setId(String id) {
+		return apply(new GedcomXRef(false, id));
 	}
 	
 	/**
@@ -70,19 +69,8 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setHusbandLink(String husbandId) {
-		if (setXRef("HUSB", husbandId)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new XRefLine(
-					"HUSB", 
-					husbandId, 
-					followPathCreate("HUSB"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(false, husbandId, 
+				"HUSB"));
 	}
 	
 	/**
@@ -91,7 +79,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getHusbandLink() {
-		return getXRef("HUSB", 0, "HUSB");
+		return getXRef("HUSB");
 	}
 	
 	/**
@@ -101,19 +89,8 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setWifeLink(String wifeId) {
-		if (setXRef("WIFE", wifeId)) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new XRefLine(
-					"WIFE", 
-					wifeId, 
-					followPathCreate("WIFE"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(false, wifeId, 
+				"WIFE"));
 	}
 	
 	/**
@@ -122,7 +99,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getWifeLink() {
-		return getXRef("WIFE", 0, "WIFE");
+		return getXRef("WIFE");
 	}
 	
 	/**
@@ -132,15 +109,8 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addChildLink(String childId) {
-		try {
-			Line line1 = new XRefLine(
-					"CHIL", 
-					childId, 
-					createPath("CHIL"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(true, childId, 
+				"CHIL"));
 	}
 	
 	/**
@@ -150,11 +120,8 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setChildLink(int index, String childId) {
-		if (setXRef("CHIL", index, childId)) {
-			return true;
-		}
-		
-		return addChildLink(childId);
+		return apply(new GedcomXRef(false, childId, 
+				"CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index));
 	}
 	
 	/**
@@ -164,7 +131,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getChildLink(int index) {
-		return getXRef("CHIL", index, "CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
+		return getXRef("CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
 	}
 	
 	/**
@@ -179,30 +146,18 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
-	 * @param married
+	 * @param isMarried
 	 * @param marriageDate
 	 * @return
 	 */
-	public boolean setMarried(boolean married, Date marriageDate) {
-		if (setValue("MARR", (married ? YesNo.YES.value : null)) 
-				&& setValue("MARR-DATE", GedcomFormatter.getDate(marriageDate))) {
-			return true;
-		}
+	public boolean setMarried(boolean isMarried, String marriageDate) {
+		GedcomValue marr = new GedcomValue(false, (isMarried ? YesNo.YES.value : null), 
+				"FAMILY_EVENT_STRUCTURE;MARR", "MARR");
 		
-		try {
-			Line line1 = new ValueLine(
-					"MARR", 
-					(married ? YesNo.YES.value : null), 
-					followPathCreate("FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
-			Line line2 = new ValueLine(
-					"MARR-DATE", 
-					GedcomFormatter.getDate(marriageDate), 
-					followPathCreate(line1.node, "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue date = new GedcomValue(false, marriageDate, marr,  
+				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		
+		return apply(marr, date);
 	}
 	
 	/**
@@ -210,8 +165,8 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public boolean getMarriage() {
-		return YesNo.YES.value.equals(getValue("MARR", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
+	public boolean isMarried() {
+		return YesNo.YES.value.equals(getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
 	}
 	
 	/**
@@ -220,42 +175,24 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getMarriageDate() {
-		return getValue("MARR-DATE", 0, "FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param divorced
+	 * @param isDivorced
 	 * @param marriageDate
 	 * @return
 	 */
-	public boolean setDivorced(boolean divorced, Date divorcedDate) {
-		if (!divorced) {
-			return true;
-		}
+	public boolean setDivorced(boolean isDivorced, String divorcedDate) {
+		GedcomDataEmpty div = new GedcomDataEmpty(false, 
+				"FAMILY_EVENT_STRUCTURE;DIV", "DIV");
 		
-		//TODO what if divorces has been set to true earlier and now to false? 
-		//-> DIV tag should be removed
+		GedcomValue date = new GedcomValue(false, divorcedDate, div,  
+				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 		
-		if (setValue("DIV", null)
-				&& setValue("DIV-DATE", GedcomFormatter.getDate(divorcedDate))) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new EmptyLine(
-					"DIV", 
-					followPathCreate("FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
-			Line line2 = new ValueLine(
-					"DIV-DATE", 
-					GedcomFormatter.getDate(divorcedDate), 
-					followPathCreate(line1.node, "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(div, date);
 	}
 	
 	/**
@@ -263,12 +200,9 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public boolean getDivorced() {
+	public boolean isDivorced() {
 		//Since the DIV tag does not have a value field, just check if the tag is there
-		return (followPath("FAMILY_EVENT_STRUCTURE;DIV", "DIV") != null);
-		
-		//Y/null value
-//		return YesNo.YES.value.equals(getValue("DIV", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV"));
+		return (getBaseNode().followPath("FAMILY_EVENT_STRUCTURE;DIV", "DIV") != null);
 	}
 	
 	/**
@@ -277,7 +211,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getDivorceDate() {
-		return getValue("DIV-DATE", 0, "FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 

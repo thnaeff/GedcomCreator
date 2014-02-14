@@ -18,10 +18,13 @@ package ch.thn.gedcom.creator.test;
 
 import java.util.Date;
 
+import ch.thn.gedcom.GedcomFormatter;
+import ch.thn.gedcom.creator.GedcomCreatorEOF;
 import ch.thn.gedcom.creator.GedcomCreatorFamily;
 import ch.thn.gedcom.creator.GedcomCreatorIndividual;
 import ch.thn.gedcom.creator.GedcomCreatorEnums.*;
 import ch.thn.gedcom.printer.GedcomStructureTextPrinter;
+import ch.thn.gedcom.printer.GedcomStructureTreePrinter;
 import ch.thn.gedcom.store.GedcomParseException;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -45,16 +48,19 @@ public class GedcomCreatorTest {
 			e.printStackTrace();
 		}
 		
+		GedcomStructureTreePrinter treePrinter = new GedcomStructureTreePrinter(true);
+		GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
+		
 		
 		GedcomCreatorIndividual indi = new GedcomCreatorIndividual(store, "1");
 		indi.setSex(Sex.MALE);
 		indi.setSex(Sex.FEMALE);
-		indi.setBirth(true, new Date());
-		indi.setDeath(true, new Date());
+		indi.setBirth(true, GedcomFormatter.getDate(new Date()));
+		indi.setDeath(true, GedcomFormatter.getDate(new Date()));
 		indi.setOccupation("occupation");
 		indi.setEducation("education");
-		indi.addName("Naeff", new String[] {"Thomas", "Thomas2"});
-		indi.addName("Naeff2", NameType.MARRIED, new String[] {"Thomas", "Thomas2"});
+		indi.addName("Naeff", "Thomas", "Thomas2");
+		indi.addName("Naeff2", NameType.MARRIED, "Thomas", "Thomas2");
 		indi.addAddress("street11", "street12", "city1", "post1", "country1", 
 				new String[] {"phone11", "phone12"}, new String[] {"email11", "email12"}, 
 				new String[] {"fax1"}, new String[] {"www1"});
@@ -66,25 +72,29 @@ public class GedcomCreatorTest {
 		indi.addChildLink("child");
 		indi.addNote("A Note");
 		indi.addNote("Another Note");
-		indi.setChangeDate(new Date());
+		indi.setChangeDate(GedcomFormatter.getDate(new Date()), GedcomFormatter.getTime(new Date()));
 		
-		GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
+//		indi.setName(1, "N", NameType.MAIDEN, "T", "T2");
 		
-		System.out.println(textPrinter.print(indi.getNode()));
+		System.out.println(textPrinter.print(indi.getTree()));
 		
 		System.out.println("------");
 		
 		GedcomCreatorFamily fam = new GedcomCreatorFamily(store, "1");
 		fam.setHusbandLink("1");
 		fam.setWifeLink("2");
-		fam.addChildLink("3");
 		fam.addChildLink("4");
-		fam.setMarried(true, new Date());
+		fam.addChildLink("3");
+		fam.setMarried(true, GedcomFormatter.getDate(new Date()));
 		fam.setDivorced(true, null);
 		
 		fam.addNote("A Family Note");
-		fam.setChangeDate(new Date());
-		System.out.println(textPrinter.print(fam.getNode()));
+		fam.setChangeDate(GedcomFormatter.getDate(new Date()), GedcomFormatter.getTime(new Date()));
+		System.out.println(textPrinter.print(fam.getTree()));
+		
+		
+		GedcomCreatorEOF eof = new GedcomCreatorEOF(store);
+		System.out.println(textPrinter.print(eof.getTree()));
 		
 	}
 

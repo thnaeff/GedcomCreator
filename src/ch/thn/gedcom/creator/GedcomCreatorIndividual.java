@@ -16,13 +16,14 @@
  */
 package ch.thn.gedcom.creator;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.creator.GedcomCreatorEnums.*;
-import ch.thn.gedcom.data.GedcomError;
+import ch.thn.gedcom.creator.GedcomCreatorEnums.NameType;
+import ch.thn.gedcom.creator.GedcomCreatorEnums.Sex;
+import ch.thn.gedcom.creator.GedcomCreatorEnums.YesNo;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -42,8 +43,10 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	public GedcomCreatorIndividual(GedcomStore store, String id) {
 		super(store, "INDIVIDUAL_RECORD", "INDI");
 		
-		addLines(new XRefLine("INDI", id, followPathCreate()));
-		
+		if (!setId(id)) {
+			throw new GedcomCreatorError("Failed to create individual with ID " + 
+					id + ". Id could not be set.");
+		}
 	}
 	
 	/**
@@ -59,70 +62,65 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean setId(String id) {
+		return apply(new GedcomXRef(false, id));
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @return
 	 */
 	public String getId() {
-		return getXRef("INDI", 0);
+		return getXRef();
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param value
+	 * @param sex
 	 * @return
 	 */
-	public boolean setSex(Sex value) {
-		if (setValue("SEX", value.value)) {
-			return true;
-		}
+	public boolean setSex(Sex sex) {
+		return apply(new GedcomValue(false, sex.value, 
+				"SEX"));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Sex getSex() {
+		String sex = getValue("SEX");
 		
-		try {
-			Line line1 = new ValueLine(
-					"SEX", 
-					value.value, 
-					followPathCreate("SEX"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
+		if (Sex.MALE.value.equals(sex)) {
+			return Sex.MALE;
+		} else if (Sex.FEMALE.value.equals(sex)) {
+			return Sex.FEMALE;
+		} else {
+			return Sex.UNKNOWN;
 		}
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @return
-	 */
-	public String getSex() {
-		return getValue("SEX", 0, "SEX");
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param hasBirth
+	 * @param isBorn
 	 * @param birthDate
 	 * @return
 	 */
-	public boolean setBirth(boolean hasBirth, Date birthDate) {
-		if (setValue("BIRT", (hasBirth ? YesNo.YES.value : null)) 
-				&& setValue("BIRT-DATE", GedcomFormatter.getDate(birthDate))) {
-			return true;
-		}
+	public boolean setBirth(boolean isBorn, String birthDate) {
+		GedcomValue born = new GedcomValue(false, (isBorn ? YesNo.YES.value : null), 
+				"INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT");
 		
-		try {
-			Line line1 = new ValueLine(
-					"BIRT", 
-					(hasBirth ? YesNo.YES.value : null), 
-					followPathCreate("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT"));
-			Line line2 = new ValueLine(
-					"BIRT-DATE", 
-					GedcomFormatter.getDate(birthDate), 
-					followPathCreate(line1.node, "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue date = new GedcomValue(false, birthDate, born, 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		
+		return apply(born, date);
 	}
 	
 	/**
@@ -130,8 +128,14 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public boolean getBirth() {
-		return YesNo.YES.value.equals(getValue("BIRT", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT"));
+	public boolean isBorn() {
+		String born = getValue("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT");
+		
+		if (YesNo.YES.value.equals(born)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -140,36 +144,25 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getBirthDate() {
-		return getValue("BIRT-DATE", 0, "INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT", 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
-
+	
 	/**
 	 * 
 	 * 
-	 * @param isDeath
+	 * @param isDead
 	 * @param deathDate
 	 * @return
 	 */
-	public boolean setDeath(boolean isDeath, Date deathDate) {
-		if (setValue("DEAT", (isDeath ? YesNo.YES.value : null)) 
-				&& setValue("DEAT-DATE", GedcomFormatter.getDate(deathDate))) {
-			return true;
-		}
+	public boolean setDeath(boolean isDead, String deathDate) {
+		GedcomValue dead = new GedcomValue(false, (isDead ? YesNo.YES.value : null), 
+				"INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT");
 		
-		try {
-			Line line1 = new ValueLine(
-					"DEAT", 
-					(isDeath ? YesNo.YES.value : null), 
-					followPathCreate("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT"));
-			Line line2 = new ValueLine(
-					"DEAT-DATE", 
-					GedcomFormatter.getDate(deathDate), 
-					followPathCreate(line1.node, "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		GedcomValue date = new GedcomValue(false, deathDate, dead, 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		
+		return apply(dead, date);
 	}
 	
 	/**
@@ -177,8 +170,14 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public boolean getDeath() {
-		return YesNo.YES.value.equals(getValue("DEAT", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT"));
+	public boolean isDead() {
+		String born = getValue("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT");
+		
+		if (YesNo.YES.value.equals(born)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -187,29 +186,20 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getDeathDate() {
-		return getValue("DEAT-DATE", 0, "INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT", 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param value
+	 * @param occupation
 	 * @return
 	 */
-	public boolean setOccupation(String value) {
-		if (setValue("OCCU", value)) {
-			return true;
-		}
+	public boolean setOccupation(String occupation) {
+		return apply(new GedcomValue(false, occupation, 
+				"INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU"));
 		
-		try {
-			Line line1 = new ValueLine(
-					"OCCU", 
-					value, 
-					followPathCreate("INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
 	}
 	
 	/**
@@ -218,29 +208,19 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getOccupation() {
-		return getValue("OCCU", 0, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU");
 	}
-	
+
 	/**
 	 * 
 	 * 
-	 * @param value
+	 * @param education
 	 * @return
 	 */
-	public boolean setEducation(String value) {
-		if (setValue("EDUC", value)) {
-			return true;
-		}
+	public boolean setEducation(String education) {
+		return apply(new GedcomValue(false, education, 
+				"INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC"));
 		
-		try {
-			Line line1 = new ValueLine(
-					"EDUC", 
-					value, 
-					followPathCreate("INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC"));
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
 	}
 	
 	/**
@@ -249,7 +229,41 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getEducation() {
-		return getValue("EDUC", 0, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC");
+	}
+	
+	/**
+	 * 
+	 * @param add
+	 * @param index
+	 * @param name The family/former/married/... name
+	 * @param nameType
+	 * @param firstNames The name of the individual (first/middle/... name)
+	 * @return
+	 */
+	private boolean setName(boolean add, int index, String name, NameType nameType, String... firstNames) {
+		String firstNamesString = GedcomFormatter.makeStringList(
+				Arrays.asList(firstNames), ", ", "", "", false, null, false).toString();
+		
+		String indexString = "";
+		
+		if (index != -1) {
+			indexString = GedcomNode.PATH_OPTION_DELIMITER + index;
+		}
+		
+		GedcomValue n = new GedcomValue(add, firstNamesString + " /" + name + "/", 
+				"PERSONAL_NAME_STRUCTURE" + indexString, "NAME");
+		
+		GedcomValue givn = new GedcomValue(add, firstNamesString, n, 
+				"PERSONAL_NAME_PIECES", "GIVN");
+		
+		GedcomValue surn = new GedcomValue(add, name, n, 
+				"PERSONAL_NAME_PIECES", "SURN");
+		
+		GedcomValue type = new GedcomValue(add, nameType.value, n, 
+				"TYPE");
+		
+		return apply(n, givn, surn, type);
 	}
 	
 	/**
@@ -272,31 +286,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addName(String name, NameType nameType, String... firstNames) {
-		String firstNamesString = GedcomFormatter.makeStringList(
-				Arrays.asList(firstNames), ", ", "", "", false, null, false).toString();
-		
-		try {
-			Line line1 = new ValueLine(
-					"NAME", 
-					firstNamesString + " /" + name + "/", 
-					createPath("PERSONAL_NAME_STRUCTURE", "NAME"));
-			Line line2 = new ValueLine(
-					"GIVN", 
-					firstNamesString, 
-					followPathCreate(line1.node, "PERSONAL_NAME_PIECES", "GIVN"));
-			Line line3 = new ValueLine(
-					"SURN", 
-					name, 
-					followPathCreate(line1.node, "PERSONAL_NAME_PIECES", "SURN"));
-			Line line4 = new ValueLine(
-					"NAME-TYPE", 
-					nameType.value, 
-					createPath(line1.node, "TYPE"));
-			
-			return addLines(line1, line2, line3, line4);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return setName(true, -1, name, nameType, firstNames);
 	}
 	
 	/**
@@ -323,17 +313,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setName(int index, String name, NameType nameType, String... firstNames) {
-		String firstNamesString = GedcomFormatter.makeStringList(
-				Arrays.asList(firstNames), ", ", "", "", false, null, false).toString();
-		
-		if (setValue("NAME", index, firstNamesString + " /" + name + "/") 
-				&& setValue("GIVN", index, firstNamesString) 
-				&& setValue("SURN", index, name) 
-				&& setValue("NAME-TYPE", index, nameType.value)) {
-			return true;
-		}
-		
-		return addName(firstNamesString, nameType, firstNames);
+		return setName(false, index, name, nameType, firstNames);
 	}
 	
 	/**
@@ -344,7 +324,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getName(int index) {
-		return getValue("NAME", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME");
+		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME");
 	}
 	
 	/**
@@ -354,7 +334,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getGivenName(int index) {
-		return getValue("GIVN", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "GIVN");
+		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "GIVN");
 	}
 	
 	/**
@@ -365,7 +345,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSurname(int index) {
-		return getValue("SURN", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "SURN");
+		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "SURN");
 	}
 	
 	/**
@@ -375,7 +355,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getNameType(int index) {
-		return getValue("NAME-TYPE", index, "PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
+		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
 	}
 	
 	/**
@@ -387,8 +367,135 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		return getNumberOfLines("PERSONAL_NAME_STRUCTURE");
 	}
 	
+	
+	
 	/**
 	 * 
+	 * @param add
+	 * @param index
+	 * @param street1
+	 * @param street2
+	 * @param city
+	 * @param post
+	 * @param country
+	 * @param phone
+	 * @param email
+	 * @param fax
+	 * @param websites
+	 * @return
+	 */
+	private boolean setAddress(boolean add, int index, String street1, String street2, String city, String post, String country, 
+			String[] phone, String[] email, String[] fax, String[] websites) {
+		//Create the address string. Each string part should not have any commas since 
+		//commas are used to separate the string parts.
+		ArrayList<String> s = new ArrayList<String>(5);
+		if (street1 != null) s.add(street1.replaceAll(",", ""));
+		if (street2 != null) s.add(street2.replaceAll(",", ""));
+		if (post != null) s.add(post.replaceAll(",", ""));
+		if (city != null) s.add(city.replaceAll(",", ""));
+		if (country != null) s.add(country.replaceAll(",", ""));
+		String addrString = GedcomFormatter.makeStringList(s, ", ", null, null, true, "", false).toString();
+				
+		String indexString = "";
+		
+		if (index != -1) {
+			indexString = GedcomNode.PATH_OPTION_DELIMITER + index;
+		}
+		
+		GedcomDataEmpty addrstruct = new GedcomDataEmpty(add, 
+				"INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + indexString, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		
+		
+		GedcomValue addr = new GedcomValue(add, addrString, addrstruct, 
+				"ADDR");
+		
+		GedcomValue adr1 = new GedcomValue(add, street1, addr, 
+				"ADR1");
+		
+		GedcomValue adr2 = new GedcomValue(add, street2, addr, 
+				"ADR2");
+		
+		GedcomValue cit = new GedcomValue(add, city, addr, 
+				"CITY");
+		
+		GedcomValue pos = new GedcomValue(add, post, addr, 
+				"POST");
+		
+		GedcomValue ctry = new GedcomValue(add, country, addr, 
+				"CTRY");
+		
+		
+		GedcomValue phon1 = (phone.length > 0 ? 
+				new GedcomValue(add, (phone[0] == null ? null : phone[0]), addrstruct, 
+				"PHON") 
+				: null);
+		
+		GedcomValue phon2 = (phone.length > 1 ? 
+				new GedcomValue(add, (phone[1] == null ? null : phone[1]), addrstruct, 
+				"PHON") 
+				: null);
+		
+		GedcomValue phon3 = (phone.length > 2 ? 
+				new GedcomValue(add, (phone[2] == null ? null : phone[2]), addrstruct, 
+				"PHON") 
+				: null);
+		
+		
+		GedcomValue email1 = (email.length > 0 ? 
+				new GedcomValue(add, (email[0] == null ? null : email[0]), addrstruct, 
+				"EMAIL") 
+				: null);
+		
+		GedcomValue email2 = (email.length > 1 ? 
+				new GedcomValue(add, (email[1] == null ? null : email[1]), addrstruct, 
+				"EMAIL") 
+				: null);
+		
+		GedcomValue email3 = (email.length > 2 ? 
+				new GedcomValue(add, (email[2] == null ? null : email[2]), addrstruct, 
+				"EMAIL") 
+				: null);
+		
+		
+		GedcomValue fax1 = (fax.length > 0 ? 
+				new GedcomValue(add, (fax[0] == null ? null : fax[0]), addrstruct, 
+				"FAX") 
+				: null);
+		
+		GedcomValue fax2 = (fax.length > 1 ? 
+				new GedcomValue(add, (fax[1] == null ? null : fax[1]), addrstruct, 
+				"FAX") 
+				: null);
+		
+		GedcomValue fax3 = (fax.length > 2 ? 
+				new GedcomValue(add, (fax[2] == null ? null : fax[2]), addrstruct, 
+				"FAX") 
+				: null);
+		
+		
+		GedcomValue www1 = (websites.length > 0 ? 
+				new GedcomValue(add, (websites[0] == null ? null : websites[0]), addrstruct, 
+				"WWW") 
+				: null);
+		
+		GedcomValue www2 = (fax.length > 1 ? 
+				new GedcomValue(add, (websites[1] == null ? null : websites[1]), addrstruct, 
+				"WWW") 
+				: null);
+		
+		GedcomValue www3 = (fax.length > 2 ? 
+				new GedcomValue(add, (websites[2] == null ? null : websites[2]), addrstruct, 
+				"WWW") 
+				: null);
+		
+		
+		
+		return apply(addrstruct, addr, adr1, adr2, cit, pos, ctry, 
+				phon1, phon2, phon3, email1, email2, email3, fax1, fax2, fax3, www1, www2, www3);
+	}
+
+	/**
+	 * Adds a new address block
 	 * 
 	 * @param street1
 	 * @param street2
@@ -403,61 +510,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public boolean addAddress(String street1, String street2, String city, String post, String country, 
 			String[] phone, String[] email, String[] fax, String[] websites) {
-		//Create the address string. Each string part should not have any commas since 
-		//commas are used to separate the string parts.
-		ArrayList<String> s = new ArrayList<String>(5);
-		if (street1 != null) s.add(street1.replaceAll(",", ""));
-		if (street2 != null) s.add(street2.replaceAll(",", ""));
-		if (post != null) s.add(post.replaceAll(",", ""));
-		if (city != null) s.add(city.replaceAll(",", ""));
-		if (country != null) s.add(country.replaceAll(",", ""));
-		String addrString = GedcomFormatter.makeStringList(s, ", ", null, null, true, "", false).toString();
-		
-		int numberOfAddresses = getNumberOfAddresses();
-		
-		GedcomNode addr = createPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI", "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
-
-		try {
-			Line line1 = new ValueLine(
-					"ADDR", 
-					addrString, 
-					createPath(addr, "ADDR"));
-			Line line2 = new ValueLine(
-					"ADR1", 
-					street1, 
-					createPath(line1.node, "ADR1"));
-			Line line3 = new ValueLine(
-					"ADR2", 
-					street2, 
-					createPath(line1.node, "ADR2"));
-			Line line4 = new ValueLine(
-					"CITY", 
-					city, 
-					createPath(line1.node, "CITY"));
-			Line line5 = new ValueLine(
-					"POST", 
-					post, 
-					createPath(line1.node, "POST"));
-			Line line6 = new ValueLine(
-					"CTRY", 
-					country, 
-					createPath(line1.node, "CTRY"));
-			
-			Line[] line7 = createMultiValueLine(phone, "PHON", numberOfAddresses, addr, "PHON");
-			Line[] line8 = createMultiValueLine(email, "EMAIL", numberOfAddresses, addr, "EMAIL");
-			Line[] line9 = createMultiValueLine(fax, "FAX", numberOfAddresses, addr, "FAX");
-			Line[] line10 = createMultiValueLine(websites, "WWW", numberOfAddresses, addr, "WWW");
-			
-			if (addLines(line1, line2, line3, line4, line5, line6)) {
-				if (addLines(line7, line8, line9, line10)) {
-					return true;
-				}
-			}
-			
-			return false;
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return setAddress(true, -1, street1, street2, city, post, country, phone, email, fax, websites);
 	}
 	
 	/**
@@ -478,30 +531,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public boolean setAddress(int index, String street1, String street2, String city, String post, String country, 
 			String[] phone, String[] email, String[] fax, String[] websites) {
-		//Create the address string. Each string part should not have any commas since 
-		//commas are used to separate the string parts.
-		ArrayList<String> s = new ArrayList<String>(5);
-		if (street1 != null) s.add(street1.replaceAll(",", ""));
-		if (street2 != null) s.add(street2.replaceAll(",", ""));
-		if (post != null) s.add(post.replaceAll(",", ""));
-		if (city != null) s.add(city.replaceAll(",", ""));
-		if (country != null) s.add(country.replaceAll(",", ""));
-		String addrString = GedcomFormatter.makeStringList(s, ", ", null, null, true, "", false).toString();
-		
-		if (setValue("ADDR", index, addrString) 
-				&& setValue("ADR1", index, street1) 
-				&& setValue("ADR2", index, street2) 
-				&& setValue("CITY", index, city) 
-				&& setValue("POST", index, post)
-				&& setValue("CTRY", index, country)
-				&& setValues("PHON", index, phone) 
-				&& setValues("EMAIL", index, email) 
-				&& setValues("FAX", index, fax) 
-				&& setValues("WWW", index, websites)) {
-			return true;
-		}
-		
-		return addAddress(street1, street2, city, post, country, phone, email, fax, websites);
+		return setAddress(false, index, street1, street2, city, post, country, phone, email, fax, websites);
 	}
 	
 	/**
@@ -511,7 +541,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getAddress(int index) {
-		return getValue("ADDR", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
 	}
 	
 	/**
@@ -521,7 +551,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getStreet1(int index) {
-		return getValue("ADR1", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR1");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR1");
 	}
 	
 	/**
@@ -531,7 +561,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getStreet2(int index) {
-		return getValue("ADR2", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR2");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR2");
 	}
 	
 	/**
@@ -541,7 +571,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCity(int index) {
-		return getValue("CITY", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CITY");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CITY");
 	}
 	
 	/**
@@ -551,7 +581,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getPost(int index) {
-		return getValue("POST", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "POST");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "POST");
 	}
 	
 	/**
@@ -561,7 +591,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getCountry(int index) {
-		return getValue("CTRY", index, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CTRY");
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CTRY");
 	}
 	
 	/**
@@ -581,7 +611,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getPhone(int index, int phoneIndex) {
-		return getValue("PHON" + index, phoneIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "PHON" + GedcomNode.PATH_OPTION_DELIMITER + phoneIndex);
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "PHON" + GedcomNode.PATH_OPTION_DELIMITER + phoneIndex);
 	}
 	
 	/**
@@ -602,7 +632,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getEMail(int index, int emailIndex) {
-		return getValue("EMAIL" + index, emailIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
 	}
 	
 	/**
@@ -623,7 +653,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getFax(int index, int faxIndex) {
-		return getValue("FAX" + index, faxIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "FAX" + GedcomNode.PATH_OPTION_DELIMITER + faxIndex);
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "FAX" + GedcomNode.PATH_OPTION_DELIMITER + faxIndex);
 	}
 	
 	/**
@@ -644,7 +674,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getWebsite(int index, int wwwIndex) {
-		return getValue("WWW" + index, wwwIndex, "INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
+		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
 	}
 	
 	/**
@@ -664,16 +694,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addSpouseLink(String familyId) {
-		try {
-			Line line1 = new XRefLine(
-					"FAMS", 
-					familyId, 
-					createPath("SPOUSE_TO_FAMILY_LINK", "FAMS"));
-			
-			return addLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(true, familyId, 
+				"SPOUSE_TO_FAMILY_LINK", "FAMS"));
 	}
 	
 	/**
@@ -683,11 +705,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSpouseLink(int index, String familyId) {
-		if (setXRef("FAMS", index, familyId)) {
-			return true;
-		}
-		
-		return addSpouseLink(familyId);
+		return apply(new GedcomXRef(false, familyId, 
+				"SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS"));
 	}
 	
 	/**
@@ -697,7 +716,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getSpouseLink(int index) {
-		return getXRef("FAMS", index, "SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
+		return getXRef("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
 	
@@ -718,16 +737,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addChildLink(String chilId) {
-		try {
-			Line line1 = new XRefLine(
-					"FAMC", 
-					chilId, 
-					createPathEnd("CHILD_TO_FAMILY_LINK", "FAMC"));
-			
-			return addLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
+		return apply(new GedcomXRef(true, chilId, 
+				"CHILD_TO_FAMILY_LINK", "FAMC"));
 	}
 	
 	/**
@@ -737,11 +748,8 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setChildLink(int index, String chilId) {
-		if (setXRef("FAMC", index, chilId)) {
-			return true;
-		}
-		
-		return addChildLink(chilId);
+		return apply(new GedcomXRef(false, chilId, 
+				"CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC"));
 	}
 	
 	/**
@@ -751,7 +759,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getChildLink(int index) {
-		return getXRef("FAMC", index, "CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
+		return getXRef("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
 	}
 	
 	/**

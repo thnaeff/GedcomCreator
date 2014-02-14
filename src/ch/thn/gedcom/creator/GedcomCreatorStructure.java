@@ -16,16 +16,10 @@
  */
 package ch.thn.gedcom.creator;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Arrays;
 
-import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.data.GedcomError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
-import ch.thn.gedcom.data.GedcomTagLine;
 import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 import ch.thn.gedcom.store.GedcomStoreStructure;
@@ -35,14 +29,9 @@ import ch.thn.gedcom.store.GedcomStoreStructure;
  *
  */
 public abstract class GedcomCreatorStructure {
-	
-	public static final int FALSE = -1;
-	
+		
 	private GedcomTree tree = null;
-	protected GedcomNode node = null;
-	
-	private HashMap<String, LinkedHashSet<GedcomNode>> nodesHash = null;
-	private HashMap<String, LinkedList<GedcomNode>> nodesList = null;
+	protected GedcomNode baseNode = null;
 
 	
 	/**
@@ -58,10 +47,7 @@ public abstract class GedcomCreatorStructure {
 		//Do not add mandatory lines. Just create them when needed
 		//t.addMandatoryChildLines(true);
 		
-		node = tree.followPathCreate(basePath);
-				
-		nodesHash = new HashMap<String, LinkedHashSet<GedcomNode>>();
-		nodesList = new HashMap<String, LinkedList<GedcomNode>>();
+		baseNode = tree.followPathCreate(basePath);
 	}
 	
 	/**
@@ -69,345 +55,25 @@ public abstract class GedcomCreatorStructure {
 	 * 
 	 * @param store
 	 * @param structureName
-	 * @param node
+	 * @param baseNode
 	 */
-	public GedcomCreatorStructure(GedcomStore store, String structureName, GedcomNode node) {
-		this.node = node;
+	public GedcomCreatorStructure(GedcomStore store, String structureName, GedcomNode baseNode) {
+		this.baseNode = baseNode;
 		
 		GedcomStoreStructure storeStructure = null;
 		
-		if (node.getStoreBlock() != null) {
-			storeStructure = node.getStoreBlock().getStoreStructure();
+		if (baseNode.getStoreBlock() != null) {
+			storeStructure = baseNode.getStoreBlock().getStoreStructure();
 		} else {
-			storeStructure = node.getStoreLine().getStoreStructure();
+			storeStructure = baseNode.getStoreLine().getStoreStructure();
 		}
 		
 		if (!storeStructure.getStructureName().equals(structureName)) {
 			throw new GedcomCreatorError("Invalid creation of " + getClass().getSimpleName() + ". " + 
-					"The " + node.getClass().getSimpleName() + 
+					"The " + baseNode.getClass().getSimpleName() + 
 					" has to match the given structure name " + structureName);
 		}
 		
-		nodesHash = new HashMap<String, LinkedHashSet<GedcomNode>>();
-		nodesList = new HashMap<String, LinkedList<GedcomNode>>();
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param lines
-	 * @return
-	 */
-	protected boolean addLines(Line[]... lines) {
-		
-		for (int i = 0; i < lines.length; i++) {
-			if (lines[i] != null) {
-				for (int j = 0; j < lines[i].length; j++) {
-					if (!addLine(lines[i][j])) {
-						return false;
-					}
-					
-					setValue(lines[i][j]);
-				}
-			}
-		}
-		
-		return true;
-		
-	}
-	
-	/**
-	 * Adds all the given lines and also sets all the values 
-	 * for the lines.
-	 * 
-	 * @param lines
-	 * @return
-	 */
-	protected boolean addLines(Line... lines) {
-		
-		for (int i = 0; i < lines.length; i++) {
-			if (!addLine(lines[i])) {
-				return false;
-			}
-			
-			setValue(lines[i]);
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Adds only lines which have not been added yet and also sets all the values 
-	 * for the lines.
-	 * 
-	 * @param lines
-	 * @return
-	 */
-	protected boolean setLines(Line[]... lines) {
-		
-		for (int i = 0; i < lines.length; i++) {
-			for (int j = 0; j < lines[i].length; j++) {
-				if (!nodesHash.containsKey(lines[i][j].key) 
-						|| !nodesHash.get(lines[i][j].key).contains(lines[i][j].node)) {
-					if (!addLine(lines[i][j])) {
-						return false;
-					}
-				}
-				
-				setValue(lines[i][j]);
-			}
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Adds only lines which have not been added yet and also sets all the values 
-	 * for the lines.
-	 * 
-	 * @param lines
-	 * @return
-	 */
-	protected boolean setLines(Line... lines) {
-		
-		for (int i = 0; i < lines.length; i++) {			
-			if (!nodesHash.containsKey(lines[i].key) 
-					|| !nodesHash.get(lines[i].key).contains(lines[i].node)) {
-				if (!addLine(lines[i])) {
-					return false;
-				}
-			}
-			
-			setValue(lines[i]);
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param line
-	 */
-	private void setValue(Line line) {
-		if (line.node != null) {
-			if (line instanceof ValueLine) {
-				line.node.setTagLineValue(line.value);
-			} else if (line instanceof XRefLine) {
-				line.node.setTagLineXRef(line.xref);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param line
-	 * @return
-	 */
-	private boolean addLine(Line line) {
-		return addLine(line.key, line.node);
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param node
-	 * @return
-	 */
-	private boolean addLine(String key, GedcomNode node) {
-		if (node == null) {
-			return true;
-		}
-		
-		if (!nodesHash.containsKey(key)) {
-			nodesHash.put(key, new LinkedHashSet<GedcomNode>());
-			nodesList.put(key, new LinkedList<GedcomNode>());
-		}
-		
-		nodesHash.get(key).add(node);
-		nodesList.get(key).add(node);
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	protected boolean setValue(String key, String value) {
-		return setValue(key, 0, value);
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param index
-	 * @param value
-	 */
-	protected boolean setValue(String key, int index, String value) {
-		if (nodesList.containsKey(key) && nodesList.get(key).size() > index && index >= 0) {
-			nodesList.get(key).get(index).setTagLineValue(value);
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Tries to set all the given values. If there are more values than existing 
-	 * lines, <code>false</code> is returned. If there are less values than 
-	 * existing lines, the rest of the existing lines are not changed and 
-	 * <code>true</code> is returned.
-	 * 
-	 * @param key
-	 * @param index
-	 * @param values
-	 * @return
-	 */
-	protected boolean setValues(String key, int index, String... values) {
-		if (nodesList.containsKey(key + index)) {
-			
-			for (int i = 0; i < values.length; i++) {
-				if (i >= nodesList.get(key + index).size()) {
-					//Can not set all the values
-					return false;
-				}
-				
-				nodesList.get(key + index).get(i).setTagLineValue(values[i]);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param xref
-	 * @return
-	 */
-	protected boolean setXRef(String key, String xref) {
-		return setXRef(key, 0, xref);
-	}
-		
-		
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param index
-	 * @param xref
-	 */
-	protected boolean setXRef(String key, int index, String xref) {
-		if (nodesList.containsKey(key) && nodesList.get(key).size() > index && index >= 0) {
-			nodesList.get(key).get(index).setTagLineXRef(xref);
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Tries to set all the given xrefs. If there are more xrefs than existing 
-	 * lines, <code>false</code> is returned. If there are less xrefs than 
-	 * existing lines, the rest of the existing lines are not changed and 
-	 * <code>true</code> is returned.
-	 * 
-	 * @param key
-	 * @param index
-	 * @param xrefs
-	 * @return
-	 */
-	protected boolean setXRefs(String key, int index, String... xrefs) {
-		if (nodesList.containsKey(key + index)) {
-			
-			for (int i = 0; i < xrefs.length; i++) {
-				if (i >= nodesList.get(key + index).size()) {
-					//Can not set all the xrefs
-					return false;
-				}
-				
-				nodesList.get(key + index).get(i).setTagLineXRef(xrefs[i]);
-			}
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Tries to get the value for the given key at the given index. If there is no 
-	 * such key because no path has been created for the given key, it tries to 
-	 * follow the given path and retrieve the value. If following the path and 
-	 * retrieving the value was successful, the path is stored for the given key.
-	 * 
-	 * @param key
-	 * @param index
-	 * @param path
-	 * @return
-	 */
-	protected String getValue(String key, int index, String... path) {
-		//If this value has been set or accessed previously, the node is saved in the list
-		if (!nodesList.containsKey(key) || nodesList.get(key).size() <= index || index < 0) {
-			GedcomNode node = followPath(path);
-			if (node == null) {
-				return null;
-			} else {
-				addLine(key, node);
-				return node.getTagLineValue();
-			}
-		}
-		
-		//TODO what happens if the line gets removed from the node?
-		
-		return nodesList.get(key).get(index).getTagLineValue();
-	}
-	
-	/**
-	 * Tries to get the xref for the given key at the given index. If there is no 
-	 * such key because no path has been created for the given key, it tries to 
-	 * follow the given path and retrieve the xref. If following the path and 
-	 * retrieving the xref was successful, the path is stored for the given key.
-	 * 
-	 * @param key
-	 * @param index
-	 * @param path
-	 * @return
-	 */
-	protected String getXRef(String key, int index, String... path) {
-		//If this xref has been set or accessed previously, the node is saved in the list
-		if (!nodesList.containsKey(key) || nodesList.get(key).size() <= index || index < 0) {
-			GedcomNode node = followPath(path);
-			if (node == null) {
-				return null;
-			} else {
-				addLine(key, node);
-				return node.getTagLineXRef();
-			}
-		}
-		
-		return nodesList.get(key).get(index).getTagLineXRef();
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param key
-	 * @param index
-	 * @return
-	 */
-	protected GedcomTagLine getLine(String key, int index) {
-		return nodesList.get(key).get(index).getNodeLine().getAsTagLine();
 	}
 	
 	/**
@@ -415,7 +81,7 @@ public abstract class GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public GedcomTree getHeadNode() {
+	public GedcomTree getTree() {
 		return tree;
 	}
 	
@@ -424,143 +90,243 @@ public abstract class GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public GedcomNode getNode() {
-		return node;
+	protected GedcomNode getBaseNode() {
+		return baseNode;
 	}
 	
 	/**
-	 * Creates the path if it does not exist
+	 * Retrieves the value at the given path, starting at the given node.
 	 * 
 	 * @param path
 	 * @return
 	 */
-	protected GedcomNode followPathCreate(String... path) {
-		return followPathCreate(node, path);
+	protected String getValue(String... path) {
+		return getValue(baseNode, path);
 	}
 	
 	/**
-	 * Creates the path if it does not exist
+	 * Retrieves the value at the given path, starting at the given node.
 	 * 
-	 * @param block
-	 * @param createNew
+	 * @param node
 	 * @param path
 	 * @return
 	 */
-	protected GedcomNode followPathCreate(GedcomNode o, String... path) {
-		try {
-			return o.followPathCreate(path);
-		} catch (GedcomError e) {
-			e.printStackTrace();
+	protected String getValue(GedcomNode node, String... path) {
+		GedcomNode n = node.followPath(path);
+		
+		if (n == null) {
+			return null;
 		}
 		
-		return null;
+		return n.getTagLineValue();
 	}
 	
 	/**
-	 * Creates a new path if there is already such a path
+	 * Retrieves the xref at the given path, starting at the base node.
 	 * 
 	 * @param path
 	 * @return
 	 */
-	protected GedcomNode createPathEnd(String... path) {
-		return createPathEnd(node, path);
+	protected String getXRef(String... path) {
+		return getXRef(baseNode, path);
 	}
 	
 	/**
-	 * Creates a new path if there is already such a path
+	 * Retrieves the xref at the given path, starting at the given node.
 	 * 
-	 * @param block
-	 * @param createNew
+	 * @param node
 	 * @param path
 	 * @return
 	 */
-	protected GedcomNode createPathEnd(GedcomNode o, String... path) {
-		try {
-			return o.createPathEnd(path);
-		} catch (GedcomError e) {
-			e.printStackTrace();
+	protected String getXRef(GedcomNode node, String... path) {
+		GedcomNode n = node.followPath(path);
+		
+		if (n == null) {
+			return null;
 		}
 		
-		return null;
+		return n.getTagLineXRef();
 	}
 	
-	/**
-	 * Creates a new path
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GedcomNode createPath(String... path) {
-		return createPath(node, path);
-	}
 	
 	/**
-	 * Creates a new path
+	 * Creates all the paths and, if successful, sets all the values/xrefs. If one 
+	 * path can not be created, it returns <code>false</code> and no values/xrefs 
+	 * are set.
 	 * 
-	 * @param block
-	 * @param createNew
-	 * @param path
-	 * @return
+	 * @param data
+	 * @return <code>true</code> if all the paths have been created successfully and 
+	 * the values/xrefs have been set. <code>false</code> if creating a path failed
 	 */
-	protected GedcomNode createPath(GedcomNode o, String... path) {
-		try {
-			return o.createPath(path);
-		} catch (GedcomError e) {
-			e.printStackTrace();
+	protected boolean apply(GedcomData... data) {
+		
+		//Try to create all the paths
+		for (int i = 0; i < data.length; i++) {
+			GedcomData d = data[i];
+			
+			if (d == null) {
+				//Skip null data
+				continue;
+			}
+			
+			GedcomNode node = baseNode;
+			
+			if (d.followPrevious != null) {
+				if (d.followPrevious.followedNode == null) {
+					throw new GedcomCreatorError("Can not follow previous data " + 
+							Arrays.toString(d.followPrevious.path) + " with continuing path " + 
+							Arrays.toString(d.path) + ". Previous data has not been " +
+							"processed yet or processing failed.");
+				}
+				
+				node = d.followPrevious.followedNode;
+			}
+			
+			if (d.add) {
+				//Add
+				d.followedNode = node.createPathEnd(d.path);
+			} else {
+				//Set
+				d.followedNode = node.followPathCreate(d.path);
+			}
+			
+			if (d.followedNode == null) {
+				return false;
+			}
+			
 		}
 		
-		return null;
-	}
-	
-	/**
-	 * Just tries to follow the path
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GedcomNode followPath(String... path) {
-		return followPath(node, path);
-	}
-	
-	/**
-	 * Just tries to follow the path
-	 * 
-	 * @param block
-	 * @param createNew
-	 * @param path
-	 * @return
-	 */
-	protected GedcomNode followPath(GedcomNode o, String... path) {
-		try {
-			return o.followPath(path);
-		} catch (GedcomError e) {
-			e.printStackTrace();
+		//Set the values since all the paths have been created
+		for (int i = 0; i < data.length; i++) {
+			GedcomData d = data[i];
+			
+			if (d == null) {
+				//Skip null data
+				continue;
+			}
+			
+			if (d.followedNode != null) {
+				if (d instanceof GedcomValue) {
+					d.followedNode.setTagLineValue(d.value);
+				} else if (d instanceof GedcomXRef) {
+					d.followedNode.setTagLineXRef(d.xref);
+				}
+				//Nothing to set for structures
+			}
 		}
 		
-		return null;
+		return true;
 	}
 	
+	/**
+	 * 
+	 * 
+	 * @param changeDate
+	 * @param changeTime
+	 * @return
+	 */
+	public boolean setChangeDate(String changeDate, String changeTime) {
+		GedcomValue date = new GedcomValue(false, changeDate, 
+				"CHANGE_DATE", "CHAN", "DATE");
+		
+		GedcomValue time = new GedcomValue(false, changeTime, date, 
+				"TIME");
+		
+		return apply(date, time);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getChangeDate() {
+		return getValue("CHANGE_DATE", "CHAN", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getChangeTime() {
+		return getValue("CHANGE_DATE", "CHAN", "DATE", "TIME");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param note
+	 * @return
+	 */
+	public boolean addNote(String note) {
+		return apply(new GedcomValue(true, note, 
+				"NOTE_STRUCTURE;NOTE;false;true", "NOTE"));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @param note
+	 * @return
+	 */
+	public boolean setNote(int index, String note) {
+		return apply(new GedcomValue(false, note, 
+				"NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE"));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public String getNote(int index) {
+		return getValue("NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getNumberOfNotes() {
+		return getNumberOfLines("NOTE_STRUCTURE");
+	}
+
 	/**
 	 * Returns the number of lines which exist at the given path. This method 
 	 * follows the given path until just before the last path part and then counts 
-	 * the number of child nodes which have the last path part.
+	 * the number of child nodes which have the last path part (tag or structure 
+	 * name and variation).
 	 * 
 	 * @param keyCountPath
 	 * @return
 	 */
 	protected int getNumberOfLines(String... keyCountPath) {
-		//No caching possible here because lines could have been added or removed 
-		//directly on the node
-		
+		return getNumberOfLines(baseNode, keyCountPath);
+	}
+	/**
+	 * Returns the number of lines which exist at the given path. This method 
+	 * follows the given path until just before the last path part and then counts 
+	 * the number of child nodes which have the last path part (tag or structure 
+	 * name and variation).
+	 * 
+	 * @param n 
+	 * @param keyCountPath
+	 * @return
+	 */
+	protected int getNumberOfLines(GedcomNode n, String... keyCountPath) {
 		GedcomNode node = null;
 				
 		if (keyCountPath.length > 1) {
 			String[] path1 = new String[keyCountPath.length - 1];
 			System.arraycopy(keyCountPath, 0, path1, 0, keyCountPath.length - 2);
 			
-			node = followPath(path1);
+			node = n.followPath(path1);
 		} else if (keyCountPath.length == 1) {
-			node = this.node;
+			node = this.baseNode;
 		}
 		
 		if (node == null) {
@@ -578,138 +344,6 @@ public abstract class GedcomCreatorStructure {
 		}
 	}
 	
-
-	/**
-	 * 
-	 * 
-	 * @param changeDate
-	 * @return
-	 */
-	public boolean setChangeDate(Date changeDate) {
-		if (setValue("CHANGE-DATE", GedcomFormatter.getDate(changeDate)) 
-				&& setValue("CHANGE-TIME", GedcomFormatter.getTime(changeDate))) {
-			return true;
-		}
-		
-		try {
-			Line line1 = new ValueLine(
-					"CHANGE-DATE", 
-					GedcomFormatter.getDate(changeDate), 
-					followPathCreate("CHANGE_DATE", "CHAN", "DATE"));
-			Line line2 = new ValueLine(
-					"CHANGE-TIME", 
-					GedcomFormatter.getTime(changeDate), 
-					followPathCreate(line1.node, "TIME"));
-			
-			return setLines(line1, line2);
-		} catch (GedcomError e) {
-			throw e;
-		}
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @return
-	 */
-	public String getChangeDate() {
-		return getValue("CHANGE-DATE", 0, "CHANGE_DATE", "CHAN", "DATE");
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @return
-	 */
-	public String getChangeTime() {
-		return getValue("CHANGE-TIME", 0, "CHANGE_DATE", "CHAN", "DATE", "TIME");
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param note
-	 * @return
-	 */
-	public boolean addNote(String note) {
-		try {
-			Line line1 = new ValueLine(
-					"NOTE", 
-					note, 
-					createPathEnd("NOTE_STRUCTURE;NOTE;false;true", "NOTE"));
-			
-			return setLines(line1);
-		} catch (GedcomError e) {
-			throw e;
-		}
-	}
-	
-	/**
-	 * 
-	 * @param index
-	 * @param note
-	 * @return
-	 */
-	public boolean setNote(int index, String note) {
-		if (setValue("NOTE", index, note)) {
-			return true;
-		}
-		
-		return addNote(note);
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public String getNote(int index) {
-		return getValue("NOTE", index, "NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE");
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param values
-	 * @param key
-	 * @param parentStructureCount
-	 * @param path
-	 * @return
-	 */
-	protected Line[] createMultiValueLine(String[] values, String key, int parentStructureCount, 
-			String... path) {
-		return createMultiValueLine(values, key, parentStructureCount, node, path);
-	}
-	
-	/**
-	 * 
-	 * 
-	 * @param values
-	 * @param key
-	 * @param parentStructureCount
-	 * @param startObject
-	 * @param path
-	 * @return
-	 */
-	protected Line[] createMultiValueLine(String[] values, String key, int parentStructureCount, 
-			GedcomNode startObject, String... path) {
-		if (values == null) {
-			return null;
-		}
-		
-		Line[] lines = new Line[values.length];
-		
-		for (int i = 0; i < values.length; i++) {
-			lines[i] = new ValueLine(
-					key + parentStructureCount, 
-					values[i], 
-					createPathEnd(startObject, path));
-		}
-		
-		return lines;
-	}
-	
 	
 	
 	/*************************************************************************
@@ -718,27 +352,32 @@ public abstract class GedcomCreatorStructure {
 	 * @author Thomas Naeff (github.com/thnaeff)
 	 *
 	 */
-	public abstract class Line {
+	public abstract class GedcomData {
 		
-		protected String key = null;
-		protected String value = null;
-		protected String xref = null;
-		protected GedcomNode node = null;
+		private boolean add = false;
+		
+		private String value = null;
+		private String xref = null;
+		private String[] path = null;
+		
+		private GedcomData followPrevious = null;
+		
+		private GedcomNode followedNode = null;
 		
 		/**
 		 * 
-		 * 
-		 * @param key
+		 * @param add
 		 * @param value
 		 * @param xref
-		 * @param node
+		 * @param path
 		 */
-		protected Line(String key, String value, String xref, GedcomNode node) {
-			this.key = key;
+		protected GedcomData(boolean add, String value, String xref, 
+				GedcomData followPrevious, String... path) {
+			this.add = add;
 			this.value = value;
 			this.xref = xref;
-			this.node = node;
-			
+			this.followPrevious = followPrevious;
+			this.path = path;
 		}
 		
 
@@ -751,19 +390,31 @@ public abstract class GedcomCreatorStructure {
 	 * @author Thomas Naeff (github.com/thnaeff)
 	 *
 	 */
-	public class ValueLine extends Line {
-
+	public class GedcomValue extends GedcomData {
+		
 		/**
 		 * 
 		 * 
-		 * @param key
+		 * @param add
 		 * @param value
-		 * @param node
+		 * @param path
 		 */
-		protected ValueLine(String key, String value, GedcomNode node) {
-			super(key, value, null, node);
-			
+		protected GedcomValue(boolean add, String value, String... path) {
+			super(add, value, null, null, path);
 		}
+		
+		/**
+		 * 
+		 * 
+		 * @param add
+		 * @param value
+		 * @param followPrevious
+		 * @param path
+		 */
+		protected GedcomValue(boolean add, String value, GedcomData followPrevious, String... path) {
+			super(add, value, null, followPrevious, path);
+		}
+		
 		
 	}
 	
@@ -774,17 +425,30 @@ public abstract class GedcomCreatorStructure {
 	 * @author Thomas Naeff (github.com/thnaeff)
 	 *
 	 */
-	public class XRefLine extends Line {
-
+	public class GedcomXRef extends GedcomData {
+		
 		/**
 		 * 
 		 * 
-		 * @param key
+		 * @param add
 		 * @param xref
-		 * @param node
+		 * @param path
 		 */
-		protected XRefLine(String key, String xref, GedcomNode node) {
-			super(key, null, xref, node);
+		protected GedcomXRef(boolean add, String xref, String... path) {
+			super(add, null, xref, null, path);
+			
+		}
+		
+		/**
+		 * 
+		 * 
+		 * @param add
+		 * @param xref
+		 * @param followPrevious
+		 * @param path
+		 */
+		protected GedcomXRef(boolean add, String xref, GedcomData followPrevious, String... path) {
+			super(add, null, xref, followPrevious, path);
 			
 		}
 		
@@ -798,19 +462,33 @@ public abstract class GedcomCreatorStructure {
 	 * @author Thomas Naeff (github.com/thnaeff)
 	 *
 	 */
-	public class EmptyLine extends Line {
-
+	public class GedcomDataEmpty extends GedcomData {
+		
 		/**
 		 * 
 		 * 
-		 * @param key
-		 * @param node
+		 * @param add
+		 * @param path
 		 */
-		protected EmptyLine(String key, GedcomNode node) {
-			super(key, null, null, node);
+		protected GedcomDataEmpty(boolean add, String... path) {
+			super(add, null, null, null, path);
 			
 		}
 		
+		/**
+		 * 
+		 * 
+		 * @param add
+		 * @param followPrevious
+		 * @param path
+		 */
+		protected GedcomDataEmpty(boolean add, GedcomData followPrevious, String... path) {
+			super(add, null, null, followPrevious, path);
+			
+		}
+		
+		
 	}
+	
 
 }
