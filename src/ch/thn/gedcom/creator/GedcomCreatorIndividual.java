@@ -359,8 +359,22 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param index
 	 * @return
 	 */
-	public String getNameType(int index) {
-		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
+	public NameType getNameType(int index) {
+		String type = getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
+		
+		if (NameType.MAIDEN.value.equals(type)) {
+			return NameType.MAIDEN;
+		} else if (NameType.MARRIED.value.equals(type)) {
+			return NameType.MARRIED;
+		} else if (NameType.BIRTH.value.equals(type)) {
+			return NameType.BIRTH;
+		} else if (NameType.AKA.value.equals(type)) {
+			return NameType.AKA;
+		} else if (NameType.IMMIGRANT.value.equals(type)) {
+			return NameType.IMMIGRANT;
+		} else {
+			return NameType.UNSPECIFIED;
+		}
 	}
 	
 	/**
