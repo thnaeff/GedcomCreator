@@ -44,7 +44,7 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorEOF(GedcomStore store, GedcomNode node) {
-		super(store, "END_OF_FILE", node);
+		super(store, "END_OF_FILE", node, "TRLR");
 	}
 	
 	/**

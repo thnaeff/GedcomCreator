@@ -56,7 +56,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorIndividual(GedcomStore store, GedcomNode node) {
-		super(store, "INDIVIDUAL_RECORD", node);
+		super(store, "INDIVIDUAL_RECORD", node, "INDI");
 	}
 	
 	/**
@@ -64,8 +64,13 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * @param id
 	 * @return
+	 * @throws GedcomCreatorError
 	 */
 	public boolean setId(String id) {
+		if (id == null || id.length() == 0) {
+			throw new GedcomCreatorError("Setting an empty ID is not allowed");
+		}
+		
 		return apply(new GedcomXRef(false, id));
 	}
 	
@@ -425,65 +430,65 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 				"CTRY");
 		
 		
-		GedcomValue phon1 = (phone.length > 0 ? 
+		GedcomValue phon1 = (phone != null && phone.length > 0 ? 
 				new GedcomValue(add, (phone[0] == null ? null : phone[0]), addrstruct, 
 				"PHON") 
 				: null);
 		
-		GedcomValue phon2 = (phone.length > 1 ? 
+		GedcomValue phon2 = (phone != null && phone.length > 1 ? 
 				new GedcomValue(add, (phone[1] == null ? null : phone[1]), addrstruct, 
 				"PHON") 
 				: null);
 		
-		GedcomValue phon3 = (phone.length > 2 ? 
+		GedcomValue phon3 = (phone != null && phone.length > 2 ? 
 				new GedcomValue(add, (phone[2] == null ? null : phone[2]), addrstruct, 
 				"PHON") 
 				: null);
 		
 		
-		GedcomValue email1 = (email.length > 0 ? 
+		GedcomValue email1 = (email != null && email.length > 0 ? 
 				new GedcomValue(add, (email[0] == null ? null : email[0]), addrstruct, 
 				"EMAIL") 
 				: null);
 		
-		GedcomValue email2 = (email.length > 1 ? 
+		GedcomValue email2 = (email != null && email.length > 1 ? 
 				new GedcomValue(add, (email[1] == null ? null : email[1]), addrstruct, 
 				"EMAIL") 
 				: null);
 		
-		GedcomValue email3 = (email.length > 2 ? 
+		GedcomValue email3 = (email != null && email.length > 2 ? 
 				new GedcomValue(add, (email[2] == null ? null : email[2]), addrstruct, 
 				"EMAIL") 
 				: null);
 		
 		
-		GedcomValue fax1 = (fax.length > 0 ? 
+		GedcomValue fax1 = (fax != null && fax.length > 0 ? 
 				new GedcomValue(add, (fax[0] == null ? null : fax[0]), addrstruct, 
 				"FAX") 
 				: null);
 		
-		GedcomValue fax2 = (fax.length > 1 ? 
+		GedcomValue fax2 = (fax != null && fax.length > 1 ? 
 				new GedcomValue(add, (fax[1] == null ? null : fax[1]), addrstruct, 
 				"FAX") 
 				: null);
 		
-		GedcomValue fax3 = (fax.length > 2 ? 
+		GedcomValue fax3 = (fax != null && fax.length > 2 ? 
 				new GedcomValue(add, (fax[2] == null ? null : fax[2]), addrstruct, 
 				"FAX") 
 				: null);
 		
 		
-		GedcomValue www1 = (websites.length > 0 ? 
+		GedcomValue www1 = (websites != null && websites.length > 0 ? 
 				new GedcomValue(add, (websites[0] == null ? null : websites[0]), addrstruct, 
 				"WWW") 
 				: null);
 		
-		GedcomValue www2 = (fax.length > 1 ? 
+		GedcomValue www2 = (websites != null && fax.length > 1 ? 
 				new GedcomValue(add, (websites[1] == null ? null : websites[1]), addrstruct, 
 				"WWW") 
 				: null);
 		
-		GedcomValue www3 = (fax.length > 2 ? 
+		GedcomValue www3 = (websites != null && fax.length > 2 ? 
 				new GedcomValue(add, (websites[2] == null ? null : websites[2]), addrstruct, 
 				"WWW") 
 				: null);

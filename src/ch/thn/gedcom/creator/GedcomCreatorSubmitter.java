@@ -50,7 +50,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorSubmitter(GedcomStore store, GedcomNode node) {
-		super(store, "SUBMITTER_RECORD", node);
+		super(store, "SUBMITTER_RECORD", node, "SUBM");
 	}
 	
 	/**
@@ -58,8 +58,13 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * 
 	 * @param id
 	 * @return
+	 * @throws GedcomCreatorError
 	 */
 	public boolean setId(String id) {
+		if (id == null || id.length() == 0) {
+			throw new GedcomCreatorError("Setting an empty ID is not allowed");
+		}
+		
 		return apply(new GedcomXRef(false, id));
 	}
 	

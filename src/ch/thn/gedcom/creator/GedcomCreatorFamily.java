@@ -49,7 +49,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorFamily(GedcomStore store, GedcomNode node) {
-		super(store, "FAM_RECORD", node);
+		super(store, "FAM_RECORD", node, "FAM");
 	}
 	
 	/**
@@ -57,8 +57,13 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * @param id
 	 * @return
+	 * @throws GedcomCreatorError
 	 */
 	public boolean setId(String id) {
+		if (id == null || id.length() == 0) {
+			throw new GedcomCreatorError("Setting an empty ID is not allowed");
+		}
+		
 		return apply(new GedcomXRef(false, id));
 	}
 	

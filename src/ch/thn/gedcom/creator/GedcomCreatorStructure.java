@@ -57,8 +57,9 @@ public abstract class GedcomCreatorStructure {
 	 * @param structureName
 	 * @param baseNode
 	 */
-	public GedcomCreatorStructure(GedcomStore store, String structureName, GedcomNode baseNode) {
-		this.baseNode = baseNode;
+	public GedcomCreatorStructure(GedcomStore store, String structureName, 
+			GedcomNode baseNode, String... basePath) {
+		this.baseNode = baseNode.followPathCreate(basePath);
 		
 		GedcomStoreStructure storeStructure = null;
 		
