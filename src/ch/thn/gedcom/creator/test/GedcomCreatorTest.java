@@ -55,8 +55,8 @@ public class GedcomCreatorTest {
 		GedcomCreatorIndividual indi = new GedcomCreatorIndividual(store, "1");
 		indi.setSex(Sex.MALE);
 		indi.setSex(Sex.FEMALE);
-		indi.setBirth(true, GedcomFormatter.getDate(new Date()));
-		indi.setDeath(true, GedcomFormatter.getDate(new Date()));
+		indi.setBirth(true, GedcomFormatter.getGedcomDate(new Date(), true, true));
+		indi.setDeath(true, GedcomFormatter.getGedcomDate(new Date(), true, true));
 		indi.setOccupation("occupation");
 		indi.setEducation("education");
 		indi.addName("Naeff", "Thomas", "Thomas2");
@@ -72,7 +72,7 @@ public class GedcomCreatorTest {
 		indi.addChildLink("child");
 		indi.addNote("A Note");
 		indi.addNote("Another Note");
-		indi.setChangeDate(GedcomFormatter.getDate(new Date()), GedcomFormatter.getTime(new Date()));
+		indi.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
 		
 //		indi.setName(1, "N", NameType.MAIDEN, "T", "T2");
 		
@@ -85,11 +85,11 @@ public class GedcomCreatorTest {
 		fam.setWifeLink("2");
 		fam.addChildLink("4");
 		fam.addChildLink("3");
-		fam.setMarried(true, GedcomFormatter.getDate(new Date()));
+		fam.setMarried(true, GedcomFormatter.getGedcomDate(new Date(), true, true));
 		fam.setDivorced(true, null);
 		
 		fam.addNote("A Family Note");
-		fam.setChangeDate(GedcomFormatter.getDate(new Date()), GedcomFormatter.getTime(new Date()));
+		fam.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
 		System.out.println(textPrinter.print(fam.getTree()));
 		
 		
