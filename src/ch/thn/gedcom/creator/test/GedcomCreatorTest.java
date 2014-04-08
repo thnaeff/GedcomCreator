@@ -48,6 +48,7 @@ public class GedcomCreatorTest {
 			e.printStackTrace();
 		}
 		
+		
 		GedcomStructureTreePrinter treePrinter = new GedcomStructureTreePrinter(true);
 		GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
 		
@@ -67,16 +68,22 @@ public class GedcomCreatorTest {
 		indi.addAddress("street21", "street22", "city2", "post2", "country2", 
 				new String[] {"phone21", "phone22", "phone23"}, new String[] {"email21", "email22"}, 
 				new String[] {"fax2"}, new String[] {"www2"});
-		indi.addSpouseLink("spouse");
-		indi.addSpouseLink("spouse");
+		indi.addSpouseLink("spouse1");
+		indi.addSpouseLink("spouse2");
 		indi.addChildLink("child");
 		indi.addNote("A Note");
 		indi.addNote("Another Note");
 		indi.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
 		
+//		indi.removeSex();
+//		indi.removePhone(1, 1);
+//		indi.removeChangeDate();
+		indi.removeAddressStructure(0);
+		
 //		indi.setName(1, "N", NameType.MAIDEN, "T", "T2");
 		
-		System.out.println(textPrinter.print(indi.getTree()));
+//		System.out.println(textPrinter.print(indi.getTree()));
+		System.out.println(treePrinter.print(indi.getTree()));
 		
 		System.out.println("------");
 		
@@ -90,11 +97,11 @@ public class GedcomCreatorTest {
 		
 		fam.addNote("A Family Note");
 		fam.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
-		System.out.println(textPrinter.print(fam.getTree()));
+//		System.out.println(textPrinter.print(fam.getTree()));
 		
 		
 		GedcomCreatorEOF eof = new GedcomCreatorEOF(store);
-		System.out.println(textPrinter.print(eof.getTree()));
+//		System.out.println(textPrinter.print(eof.getTree()));
 		
 	}
 

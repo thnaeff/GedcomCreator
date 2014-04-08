@@ -65,7 +65,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 			throw new GedcomCreatorError("Setting an empty ID is not allowed");
 		}
 		
-		return apply(new GedcomXRef(false, id));
+		return createAndSet(new GedcomXRef(false, id));
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSubmitterName(String name) {
-		return apply(new GedcomValue(false, name, "NAME"));
+		return createAndSet(new GedcomValue(false, name, "NAME"));
 	}
 	
 	/**
@@ -96,6 +96,15 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 */
 	public String getSubmitterName() {
 		return getValue("NAME");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeSubmitterName() {
+		return remove("NAME");
 	}
 
 }

@@ -64,7 +64,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 			throw new GedcomCreatorError("Setting an empty ID is not allowed");
 		}
 		
-		return apply(new GedcomXRef(false, id));
+		return createAndSet(new GedcomXRef(false, id));
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setHusbandLink(String husbandId) {
-		return apply(new GedcomXRef(false, husbandId, 
+		return createAndSet(new GedcomXRef(false, husbandId, 
 				"HUSB"));
 	}
 	
@@ -90,11 +90,20 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public boolean removeHusbandLink() {
+		return remove("HUSB");
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @param wifeId
 	 * @return
 	 */
 	public boolean setWifeLink(String wifeId) {
-		return apply(new GedcomXRef(false, wifeId, 
+		return createAndSet(new GedcomXRef(false, wifeId, 
 				"WIFE"));
 	}
 	
@@ -110,11 +119,20 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public boolean removeWifeLink() {
+		return remove("WIFE");
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @param childId
 	 * @return
 	 */
 	public boolean addChildLink(String childId) {
-		return apply(new GedcomXRef(true, childId, 
+		return createAndSet(new GedcomXRef(true, childId, 
 				"CHIL"));
 	}
 	
@@ -125,7 +143,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setChildLink(int index, String childId) {
-		return apply(new GedcomXRef(false, childId, 
+		return createAndSet(new GedcomXRef(false, childId, 
 				"CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index));
 	}
 	
@@ -137,6 +155,16 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 */
 	public String getChildLink(int index) {
 		return getXRef("CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeChildLink(int index) {
+		return remove("CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
 	}
 	
 	/**
@@ -162,7 +190,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 		GedcomValue date = new GedcomValue(false, marriageDate, marr,  
 				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 		
-		return apply(marr, date);
+		return createAndSet(marr, date);
 	}
 	
 	/**
@@ -179,8 +207,26 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeMarried() {
+		return remove("FAMILY_EVENT_STRUCTURE;MARR", "MARR");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getMarriageDate() {
 		return getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeMarriageDate() {
+		return remove("FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -197,7 +243,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 		GedcomValue date = new GedcomValue(false, divorcedDate, div,  
 				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 		
-		return apply(div, date);
+		return createAndSet(div, date);
 	}
 	
 	/**
@@ -215,8 +261,26 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeDivorced() {
+		return remove("FAMILY_EVENT_STRUCTURE;DIV", "DIV");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getDivorceDate() {
 		return getValue("FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeDivorceDate() {
+		return remove("FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
 

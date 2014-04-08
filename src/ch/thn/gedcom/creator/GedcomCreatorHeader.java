@@ -27,7 +27,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 
 	
 	/**
-	 * A HEADER
+	 * A HEADER structures
 	 * 
 	 * @param store
 	 */
@@ -43,25 +43,88 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorHeader(GedcomStore store, GedcomNode node) {
-		super(store, "HEADER", node, "HEAD");
+		super(store, "HEADER structures", node, "HEAD");
 	}
 	
 	/**
-	 * Not available for HEADER
+	 * Not available for HEADER structures
 	 * 
 	 */
 	@Override
 	public boolean setChangeDate(String changeDate, String changeTime) {
-		throw new UnsupportedOperationException("No change date available in HEADER. Use transmission date instead.");
+		throw new UnsupportedOperationException("No change date available in HEADER structures.");
 	}
 	
 	/**
-	 * Not available for HEADER
+	 * Not available for HEADER structures
 	 * 
 	 */
 	@Override
 	public String getChangeDate() {
-		throw new UnsupportedOperationException("No change date available in HEADER. Use transmission date instead.");
+		throw new UnsupportedOperationException("No change date available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public boolean removeChangeDate() {
+		throw new UnsupportedOperationException("No change date available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public String getChangeTime() {
+		throw new UnsupportedOperationException("No change time available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public boolean removeChangeTime() {
+		throw new UnsupportedOperationException("No change time available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public boolean setNote(int index, String note) {
+		throw new UnsupportedOperationException("No notes available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public boolean addNote(String note) {
+		throw new UnsupportedOperationException("No notes available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public String getNote(int index) {
+		throw new UnsupportedOperationException("No notes available in HEADER structures.");
+	}
+	
+	/**
+	 * Not available for HEADER structures
+	 * 
+	 */
+	@Override
+	public boolean removeNote(int index) {
+		throw new UnsupportedOperationException("No notes available in HEADER structures.");
 	}
 	
 	
@@ -84,7 +147,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 				"CORP");
 		
 		
-		return apply(sour, name, corp);
+		return createAndSet(sour, name, corp);
 	}
 	
 	/**
@@ -101,6 +164,15 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeSource() {
+		return remove("SOUR");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getName() {
 		return getValue("SOUR", "NAME");
 	}
@@ -110,8 +182,26 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeName() {
+		return remove("SOUR", "NAME");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getCoorporation() {
 		return getValue("SOUR", "CORP");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeCoorporation() {
+		return remove("SOUR", "CORP");
 	}
 	
 	/**
@@ -128,7 +218,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 		GedcomValue time = new GedcomValue(false, transmissionTime, date, 
 				"TIME");
 		
-		return apply(date, time);
+		return createAndSet(date, time);
 	}
 	
 	/**
@@ -145,8 +235,26 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeTransmissionDate() {
+		return remove("DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getTransmissionTime() {
 		return getValue("DATE", "TIME");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeTransmissionTime() {
+		return remove("DATE", "TIME");
 	}
 	
 	/**
@@ -156,7 +264,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSubmitterRecordLink(String submitterRecordId) {
-		return apply(new GedcomXRef(false, submitterRecordId, "SUBM"));
+		return createAndSet(new GedcomXRef(false, submitterRecordId, "SUBM"));
 	}
 	
 	/**
@@ -164,8 +272,17 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
-	public String setSubmitterRecordLink() {
+	public String getSubmitterRecordLink() {
 		return getXRef("SUBM");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeSubmitterRecordLink() {
+		return remove("SUBM");
 	}
 	
 	/**
@@ -182,7 +299,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 		GedcomValue form = new GedcomValue(false, gedcomForm, 
 				"GEDC", "FORM");
 		
-		return apply(version, form);
+		return createAndSet(version, form);
 	}
 	
 	/**
@@ -199,8 +316,26 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeGedcomVersion() {
+		return remove("GEDC", "VERS");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getGedcomForm() {
 		return getValue("GEDC", "FORM");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeGedcomForm() {
+		return remove("GEDC", "FORM");
 	}
 	
 	/**
@@ -210,7 +345,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setCharacterSet(String characterSet) {
-		return apply(new GedcomValue(false, characterSet, 
+		return createAndSet(new GedcomValue(false, characterSet, 
 				"CHAR"));
 	}
 	
@@ -226,11 +361,20 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public boolean removeCharacterSet() {
+		return remove("CHAR");
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @param language
 	 * @return
 	 */
 	public boolean setLanguage(String language) {
-		return apply(new GedcomValue(false, language, 
+		return createAndSet(new GedcomValue(false, language, 
 				"LANG"));
 	}
 	
@@ -241,6 +385,15 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 */
 	public String getLanguage() {
 		return getValue("LANG");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeLanguage() {
+		return remove("LANG");
 	}
 	
 

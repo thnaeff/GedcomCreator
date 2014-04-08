@@ -153,13 +153,14 @@ public abstract class GedcomCreatorStructure {
 	/**
 	 * Creates all the paths and, if successful, sets all the values/xrefs. If one 
 	 * path can not be created, it returns <code>false</code> and no values/xrefs 
-	 * are set.
+	 * are set (the paths are still created in the order of the given data array 
+	 * until the first path creation fails).
 	 * 
 	 * @param data
 	 * @return <code>true</code> if all the paths have been created successfully and 
 	 * the values/xrefs have been set. <code>false</code> if creating a path failed
 	 */
-	protected boolean apply(GedcomData... data) {
+	protected boolean createAndSet(GedcomData... data) {
 		
 		//Try to create all the paths
 		for (int i = 0; i < data.length; i++) {
@@ -220,6 +221,37 @@ public abstract class GedcomCreatorStructure {
 	}
 	
 	/**
+	 * Removes the line at the end of the given path. If one 
+	 * path can not be removed, it returns <code>false</code> and no paths are 
+	 * removed.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected boolean remove(String... path) {
+		return remove(baseNode, path);
+	}
+	
+	/**
+	 * Removes the line at the end of the given path. If one 
+	 * path can not be removed, it returns <code>false</code> and no paths are 
+	 * removed. In addition, any unused and empty parent nodes are removed too.
+	 * 
+	 * @param node
+	 * @param path
+	 * @return
+	 */
+	protected boolean remove(GedcomNode node, String... path) {
+		node = node.removePath(path);
+		
+		if (node == null) {
+			return false;
+		}
+						
+		return true;
+	}
+	
+	/**
 	 * 
 	 * 
 	 * @param changeDate
@@ -233,7 +265,7 @@ public abstract class GedcomCreatorStructure {
 		GedcomValue time = new GedcomValue(false, changeTime, date, 
 				"TIME");
 		
-		return apply(date, time);
+		return createAndSet(date, time);
 	}
 	
 	/**
@@ -250,8 +282,26 @@ public abstract class GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeChangeDate() {
+		return remove("CHANGE_DATE", "CHAN", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getChangeTime() {
 		return getValue("CHANGE_DATE", "CHAN", "DATE", "TIME");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeChangeTime() {
+		return remove("CHANGE_DATE", "CHAN", "DATE", "TIME");
 	}
 	
 	/**
@@ -261,7 +311,7 @@ public abstract class GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addNote(String note) {
-		return apply(new GedcomValue(true, note, 
+		return createAndSet(new GedcomValue(true, note, 
 				"NOTE_STRUCTURE;NOTE;false;true", "NOTE"));
 	}
 	
@@ -273,7 +323,7 @@ public abstract class GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setNote(int index, String note) {
-		return apply(new GedcomValue(false, note, 
+		return createAndSet(new GedcomValue(false, note, 
 				"NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE"));
 	}
 	
@@ -285,6 +335,16 @@ public abstract class GedcomCreatorStructure {
 	 */
 	public String getNote(int index) {
 		return getValue("NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeNote(int index) {
+		return remove("NOTE_STRUCTURE;NOTE;false;true" + GedcomNode.PATH_OPTION_DELIMITER + index, "NOTE");
 	}
 	
 	/**

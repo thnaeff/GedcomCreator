@@ -71,7 +71,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 			throw new GedcomCreatorError("Setting an empty ID is not allowed");
 		}
 		
-		return apply(new GedcomXRef(false, id));
+		return createAndSet(new GedcomXRef(false, id));
 	}
 	
 	/**
@@ -90,8 +90,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSex(Sex sex) {
-		return apply(new GedcomValue(false, sex.value, 
+		return createAndSet(new GedcomValue(false, (sex == null ? null : sex.value), 
 				"SEX"));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeSex() {
+		return remove("SEX");
 	}
 	
 	/**
@@ -125,7 +134,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		GedcomValue date = new GedcomValue(false, birthDate, born, 
 				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 		
-		return apply(born, date);
+		return createAndSet(born, date);
 	}
 	
 	/**
@@ -148,8 +157,27 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeBirth(boolean isBorn, String birthDate) {
+		return remove("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getBirthDate() {
 		return getValue("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT", 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeBirthDate() {
+		return remove("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT", 
 				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
@@ -167,7 +195,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		GedcomValue date = new GedcomValue(false, deathDate, dead, 
 				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 		
-		return apply(dead, date);
+		return createAndSet(dead, date);
 	}
 	
 	/**
@@ -190,8 +218,27 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * @return
 	 */
+	public boolean removeDeath() {
+		return remove("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
 	public String getDeathDate() {
 		return getValue("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT", 
+				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeDeathDate() {
+		return remove("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT", 
 				"INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
 	}
 	
@@ -202,7 +249,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setOccupation(String occupation) {
-		return apply(new GedcomValue(false, occupation, 
+		return createAndSet(new GedcomValue(false, occupation, 
 				"INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU"));
 		
 	}
@@ -215,6 +262,15 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	public String getOccupation() {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU");
 	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeOccupation() {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;OCCU", "OCCU");
+	}
 
 	/**
 	 * 
@@ -223,7 +279,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setEducation(String education) {
-		return apply(new GedcomValue(false, education, 
+		return createAndSet(new GedcomValue(false, education, 
 				"INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC"));
 		
 	}
@@ -235,6 +291,15 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getEducation() {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean removeEducation() {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;EDUC", "EDUC");
 	}
 	
 	/**
@@ -265,10 +330,10 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		GedcomValue surn = new GedcomValue(add, name, n, 
 				"PERSONAL_NAME_PIECES", "SURN");
 		
-		GedcomValue type = new GedcomValue(add, nameType.value, n, 
+		GedcomValue type = new GedcomValue(add, (nameType == null ? null : nameType.value), n, 
 				"TYPE");
 		
-		return apply(n, givn, surn, type);
+		return createAndSet(n, givn, surn, type);
 	}
 	
 	/**
@@ -333,6 +398,15 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeName(int index) {
+		return remove("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME");
+	}
+	
+	/**
 	 * given name = first name = forename
 	 * 
 	 * @param index
@@ -340,6 +414,15 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getGivenName(int index) {
 		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "GIVN");
+	}
+	
+	/**
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeGivenName(int index) {
+		return remove("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "GIVN");
 	}
 	
 	/**
@@ -351,6 +434,15 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getSurname(int index) {
 		return getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "SURN");
+	}
+	
+	/**
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeSurname(int index) {
+		return remove("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "PERSONAL_NAME_PIECES", "SURN");
 	}
 	
 	/**
@@ -375,6 +467,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		} else {
 			return NameType.UNSPECIFIED;
 		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeNameType(int index) {
+		return remove("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
+		
 	}
 	
 	/**
@@ -509,7 +612,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		
 		
 		
-		return apply(addrstruct, addr, adr1, adr2, cit, pos, ctry, 
+		return createAndSet(addrstruct, addr, adr1, adr2, cit, pos, ctry, 
 				phon1, phon2, phon3, email1, email2, email3, fax1, fax2, fax3, www1, www2, www3);
 	}
 
@@ -559,6 +662,26 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param index
 	 * @return
 	 */
+	public boolean removeAddress(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
+	}
+	
+	/**
+	 * An additional method to remove the whole address structure, including PHON, EMAIL, etc.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeAddressStructure(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public String getAddress(int index) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
 	}
@@ -579,8 +702,28 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param index
 	 * @return
 	 */
+	public boolean removeStreet1(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR1");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public String getStreet2(int index) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR2");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeStreet2(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "ADR2");
 	}
 	
 	/**
@@ -599,6 +742,16 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param index
 	 * @return
 	 */
+	public boolean removeCity(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CITY");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public String getPost(int index) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "POST");
 	}
@@ -609,8 +762,28 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @param index
 	 * @return
 	 */
+	public boolean removePost(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "POST");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public String getCountry(int index) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CTRY");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeCountry(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR", "CTRY");
 	}
 	
 	/**
@@ -637,6 +810,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param index
+	 * @param phoneIndex
+	 * @return
+	 */
+	public boolean removePhone(int index, int phoneIndex) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "PHON" + GedcomNode.PATH_OPTION_DELIMITER + phoneIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
 	 * @return
 	 */
 	public int getNumberOfPhones(int index) {
@@ -652,6 +836,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getEMail(int index, int emailIndex) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index Index of address structure
+	 * @param emailIndex Index of e-mail within address structure
+	 * @return
+	 */
+	public boolean removeEMail(int index, int emailIndex) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
 	}
 	
 	/**
@@ -679,6 +874,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param index
+	 * @param faxIndex
+	 * @return
+	 */
+	public boolean removeFax(int index, int faxIndex) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "FAX" + GedcomNode.PATH_OPTION_DELIMITER + faxIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
 	 * @return
 	 */
 	public int getNumberOfFax(int index) {
@@ -700,6 +906,17 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param index
+	 * @param wwwIndex
+	 * @return
+	 */
+	public boolean removeWebsite(int index, int wwwIndex) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", "INDIVIDUAL_EVENT_DETAIL", "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
 	 * @return
 	 */
 	public int getNumberOfWebsites(int index) {
@@ -713,7 +930,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addSpouseLink(String familyId) {
-		return apply(new GedcomXRef(true, familyId, 
+		return createAndSet(new GedcomXRef(true, familyId, 
 				"SPOUSE_TO_FAMILY_LINK", "FAMS"));
 	}
 	
@@ -724,7 +941,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setSpouseLink(int index, String familyId) {
-		return apply(new GedcomXRef(false, familyId, 
+		return createAndSet(new GedcomXRef(false, familyId, 
 				"SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS"));
 	}
 	
@@ -736,6 +953,16 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getSpouseLink(int index) {
 		return getXRef("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeSpouseLink(int index) {
+		return remove("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
 	
@@ -756,7 +983,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean addChildLink(String chilId) {
-		return apply(new GedcomXRef(true, chilId, 
+		return createAndSet(new GedcomXRef(true, chilId, 
 				"CHILD_TO_FAMILY_LINK", "FAMC"));
 	}
 	
@@ -767,7 +994,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean setChildLink(int index, String chilId) {
-		return apply(new GedcomXRef(false, chilId, 
+		return createAndSet(new GedcomXRef(false, chilId, 
 				"CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC"));
 	}
 	
@@ -779,6 +1006,16 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getChildLink(int index) {
 		return getXRef("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeChildLink(int index) {
+		return remove("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
 	}
 	
 	/**

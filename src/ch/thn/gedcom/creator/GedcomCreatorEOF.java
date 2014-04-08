@@ -27,14 +27,14 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 
 	
 	/**
-	 * A END_OF_FILE
+	 * A END_OF_FILE structures
 	 * 
 	 * @param store
 	 */
 	public GedcomCreatorEOF(GedcomStore store) {
 		super(store, "END_OF_FILE");
 		
-		apply(new GedcomDataEmpty(false, "TRLR"));
+		createAndSet(new GedcomDataEmpty(false, "TRLR"));
 	}
 	
 	/**
@@ -44,53 +44,88 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorEOF(GedcomStore store, GedcomNode node) {
-		super(store, "END_OF_FILE", node, "TRLR");
+		super(store, "END_OF_FILE structures", node, "TRLR");
 	}
 	
 	/**
-	 * Not available for END_OF_FILE
+	 * Not available for END_OF_FILE structures
 	 * 
 	 */
 	@Override
 	public boolean setChangeDate(String changeDate, String changeTime) {
-		throw new UnsupportedOperationException("No change date available in END_OF_FILE.");
+		throw new UnsupportedOperationException("No change date available in END_OF_FILE structures.");
 	}
 	
 	/**
-	 * Not available for END_OF_FILE
+	 * Not available for END_OF_FILE structures
 	 * 
 	 */
 	@Override
 	public String getChangeDate() {
-		throw new UnsupportedOperationException("No change date available in END_OF_FILE.");
+		throw new UnsupportedOperationException("No change date available in END_OF_FILE structures.");
 	}
 	
 	/**
-	 * Not available for END_OF_FILE
+	 * Not available for END_OF_FILE structures
+	 * 
+	 */
+	@Override
+	public boolean removeChangeDate() {
+		throw new UnsupportedOperationException("No change date available in END_OF_FILE structures.");
+	}
+	
+	/**
+	 * Not available for END_OF_FILE structures
+	 * 
+	 */
+	@Override
+	public String getChangeTime() {
+		throw new UnsupportedOperationException("No change time available in END_OF_FILE structures.");
+	}
+	
+	/**
+	 * Not available for END_OF_FILE structures
+	 * 
+	 */
+	@Override
+	public boolean removeChangeTime() {
+		throw new UnsupportedOperationException("No change time available in END_OF_FILE structures.");
+	}
+	
+	/**
+	 * Not available for END_OF_FILE structures
 	 * 
 	 */
 	@Override
 	public boolean setNote(int index, String note) {
-		throw new UnsupportedOperationException("No notes available in END_OF_FILE.");
+		throw new UnsupportedOperationException("No notes available in END_OF_FILE structures.");
 	}
 	
 	/**
-	 * Not available for END_OF_FILE
+	 * Not available for END_OF_FILE structures
 	 * 
 	 */
 	@Override
 	public boolean addNote(String note) {
-		throw new UnsupportedOperationException("No notes available in END_OF_FILE.");
+		throw new UnsupportedOperationException("No notes available in END_OF_FILE structures.");
 	}
 	
 	/**
-	 * Not available for END_OF_FILE
+	 * Not available for END_OF_FILE structures
 	 * 
 	 */
 	@Override
 	public String getNote(int index) {
-		throw new UnsupportedOperationException("No notes available in END_OF_FILE.");
+		throw new UnsupportedOperationException("No notes available in END_OF_FILE structures.");
 	}
 	
+	/**
+	 * Not available for END_OF_FILE structures
+	 * 
+	 */
+	@Override
+	public boolean removeNote(int index) {
+		throw new UnsupportedOperationException("No notes available in END_OF_FILE structures.");
+	}
 
 }
