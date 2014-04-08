@@ -1,5 +1,5 @@
 # GedcomCreator
-**A library to easily create basic [GEDCOM](http://en.wikipedia.org/wiki/GEDCOM)-structures. Those structures can then also be used to create more complex structures if needed.**
+**A library to easily create basic [GEDCOM](http://en.wikipedia.org/wiki/GEDCOM)-structures. Those structures can then also be used to create more complex structures if needed -> it serves as a great starting point to set up a structure.**
 
 GedcomCreator uses the [GedcomStore](https://github.com/thnaeff/GedcomStore) library to create the GEDCOM structures. GedcomCreator, however, provides some basic classes and methods to get started on setting up the structures. The library comes with classes for:
 * The header structure HEADER `GedcomCreatorHeader`
@@ -10,9 +10,11 @@ GedcomCreator uses the [GedcomStore](https://github.com/thnaeff/GedcomStore) lib
 
 Those classes have methods implemented which will help with the most common situations in creating a GEDCOM structure. The `GedcomCreatorIndividual` class for example has methods to set the gender, birth date, death date, address etc. of an individual. Since the GedcomCreator depends on the GedcomStore library, each structure class needs a GedcomStore instance in the constructor.
 
+The GedcomCreator is made for the GEDCOM specifications version 5.5 and 5.5.1. gedg files for both versions are included in the [GedcomStore](https://github.com/thnaeff/GedcomStore).
+
 
 ## Example
-Here is a short example to get started with the GedcomCreator:
+Here is a short example to get started with the GedcomCreator. All set/add-Methods also have a get- and remove-Method:
 
 ```Java
 GedcomStore store = new GedcomStore();
@@ -113,7 +115,6 @@ The output of this example code is:
   1 CHAN
     2 DATE 09 FEB 2014
       3 TIME 12:10:01
-  1 NOTE A Family Note
   1 NOTE A Family Note
 ```
 

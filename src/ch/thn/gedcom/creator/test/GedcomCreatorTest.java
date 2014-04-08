@@ -43,7 +43,7 @@ public class GedcomCreatorTest {
 		store.showParsingOutput(false);
 		
 		try {
-			store.parse("/home/thomas/Projects/java/GedcomStore/gedcomobjects_5.5.1_test.gedg");
+			store.parse("/home/thomas/Projects/java/GedcomStore/gedcomobjects_5.5.1.gedg");
 		} catch (GedcomParseException e) {
 			e.printStackTrace();
 		}
@@ -78,7 +78,7 @@ public class GedcomCreatorTest {
 //		indi.removeSex();
 //		indi.removePhone(1, 1);
 //		indi.removeChangeDate();
-		indi.removeAddressStructure(0);
+//		indi.removeAddressStructure(0);
 		
 //		indi.setName(1, "N", NameType.MAIDEN, "T", "T2");
 		
@@ -97,11 +97,12 @@ public class GedcomCreatorTest {
 		
 		fam.addNote("A Family Note");
 		fam.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
-//		System.out.println(textPrinter.print(fam.getTree()));
+		System.out.println(textPrinter.print(fam.getTree()));
 		
+		System.out.println("------");
 		
 		GedcomCreatorEOF eof = new GedcomCreatorEOF(store);
-//		System.out.println(textPrinter.print(eof.getTree()));
+		System.out.println(textPrinter.print(eof.getTree()));
 		
 	}
 

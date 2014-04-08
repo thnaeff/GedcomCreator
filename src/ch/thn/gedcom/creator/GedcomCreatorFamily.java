@@ -188,7 +188,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 				"FAMILY_EVENT_STRUCTURE;MARR", "MARR");
 		
 		GedcomValue date = new GedcomValue(false, marriageDate, marr,  
-				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+				(!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 		
 		return createAndSet(marr, date);
 	}
@@ -217,7 +217,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getMarriageDate() {
-		return getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR", (!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -226,7 +226,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean removeMarriageDate() {
-		return remove("FAMILY_EVENT_STRUCTURE;MARR", "MARR", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return remove("FAMILY_EVENT_STRUCTURE;MARR", "MARR", (!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -241,7 +241,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 				"FAMILY_EVENT_STRUCTURE;DIV", "DIV");
 		
 		GedcomValue date = new GedcomValue(false, divorcedDate, div,  
-				"FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+				(!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 		
 		return createAndSet(div, date);
 	}
@@ -271,7 +271,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public String getDivorceDate() {
-		return getValue("FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return getValue("FAMILY_EVENT_STRUCTURE;DIV", "DIV", (!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 	}
 	
 	/**
@@ -280,7 +280,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @return
 	 */
 	public boolean removeDivorceDate() {
-		return remove("FAMILY_EVENT_STRUCTURE;DIV", "DIV", "FAMILY_EVENT_DETAIL", "EVENT_DETAIL", "DATE");
+		return remove("FAMILY_EVENT_STRUCTURE;DIV", "DIV", (!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 	}
 	
 

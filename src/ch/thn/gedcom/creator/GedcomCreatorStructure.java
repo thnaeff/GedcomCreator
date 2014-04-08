@@ -33,6 +33,7 @@ public abstract class GedcomCreatorStructure {
 	private GedcomTree tree = null;
 	protected GedcomNode baseNode = null;
 
+	private boolean v55 = false;
 	
 	/**
 	 * 
@@ -43,11 +44,22 @@ public abstract class GedcomCreatorStructure {
 	 */
 	public GedcomCreatorStructure(GedcomStore store, String structureName, String... basePath) {
 		
+		v55 = store.getFileVersion().equals("5.5");
+		
 		tree = store.getGedcomTree(structureName);
 		//Do not add mandatory lines. Just create them when needed
 		//t.addMandatoryChildLines(true);
 		
 		baseNode = tree.followPathCreate(basePath);
+	}
+	
+	/**
+	 * Returns <code>true</code> if the loaded gedcom grammar file is version 5.5
+	 * 
+	 * @return
+	 */
+	protected boolean isV55() {
+		return v55;
 	}
 	
 	/**
