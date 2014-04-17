@@ -43,7 +43,7 @@ public class GedcomCreatorTest {
 		store.showParsingOutput(false);
 		
 		try {
-			store.parse("/home/thomas/Projects/java/GedcomStore/gedcomobjects_5.5.1.gedg");
+			store.parse(store.getClass().getResource("/gedcomobjects_5.5.1.gedg").getPath());
 		} catch (GedcomParseException e) {
 			e.printStackTrace();
 		}
