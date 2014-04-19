@@ -83,8 +83,8 @@ public abstract class GedcomCreatorStructure {
 		
 		if (!storeStructure.getStructureName().equals(structureName)) {
 			throw new GedcomCreatorError("Invalid creation of " + getClass().getSimpleName() + ". " + 
-					"The " + baseNode.getClass().getSimpleName() + 
-					" has to match the given structure name " + structureName);
+					"The " + baseNode.getClass().getSimpleName() + " '" + storeStructure.getStructureName() + 
+					"' does not match the given structure name '" + structureName + "'");
 		}
 		
 	}
