@@ -43,7 +43,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @param node
 	 */
 	public GedcomCreatorHeader(GedcomStore store, GedcomNode node) {
-		super(store, "HEADER structures", node, "HEAD");
+		super(store, "HEADER", node, "HEAD");
 	}
 	
 	/**
