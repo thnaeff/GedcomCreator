@@ -19,10 +19,10 @@ package ch.thn.gedcom.creator.test;
 import java.util.Date;
 
 import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.creator.GedcomCreatorEOF;
-import ch.thn.gedcom.creator.GedcomCreatorFamily;
-import ch.thn.gedcom.creator.GedcomCreatorIndividual;
-import ch.thn.gedcom.creator.GedcomCreatorEnums.*;
+import ch.thn.gedcom.creator.GedcomEOF;
+import ch.thn.gedcom.creator.GedcomFamily;
+import ch.thn.gedcom.creator.GedcomIndividual;
+import ch.thn.gedcom.creator.GedcomEnums.*;
 import ch.thn.gedcom.printer.GedcomStructureTextPrinter;
 import ch.thn.gedcom.printer.GedcomStructureTreePrinter;
 import ch.thn.gedcom.store.GedcomParseException;
@@ -49,11 +49,11 @@ public class GedcomCreatorTest {
 		}
 		
 		
-		GedcomStructureTreePrinter treePrinter = new GedcomStructureTreePrinter(true);
+		GedcomStructureTreePrinter treePrinter = new GedcomStructureTreePrinter();
 		GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
 		
 		
-		GedcomCreatorIndividual indi = new GedcomCreatorIndividual(store, "1");
+		GedcomIndividual indi = new GedcomIndividual(store, "1");
 		indi.setSex(Sex.MALE);
 		indi.setSex(Sex.FEMALE);
 		indi.setBirth(true, GedcomFormatter.getGedcomDate(new Date(), true, true));
@@ -87,7 +87,7 @@ public class GedcomCreatorTest {
 		
 		System.out.println("------");
 		
-		GedcomCreatorFamily fam = new GedcomCreatorFamily(store, "1");
+		GedcomFamily fam = new GedcomFamily(store, "1");
 		fam.setHusbandLink("1");
 		fam.setWifeLink("2");
 		fam.addChildLink("4");
@@ -101,7 +101,7 @@ public class GedcomCreatorTest {
 		
 		System.out.println("------");
 		
-		GedcomCreatorEOF eof = new GedcomCreatorEOF(store);
+		GedcomEOF eof = new GedcomEOF(store);
 		System.out.println(textPrinter.print(eof.getTree()));
 		
 	}

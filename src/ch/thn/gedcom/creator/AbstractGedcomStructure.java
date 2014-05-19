@@ -20,17 +20,15 @@ import java.util.Arrays;
 
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
-import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
-import ch.thn.gedcom.store.GedcomStoreStructure;
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public abstract class GedcomCreatorStructure {
+public abstract class AbstractGedcomStructure {
 		
-	private GedcomTree tree = null;
+	private GedcomNode treeHead = null;
 	protected GedcomNode baseNode = null;
 
 	private boolean v55 = false;
@@ -42,15 +40,38 @@ public abstract class GedcomCreatorStructure {
 	 * @param structureName
 	 * @param basePath
 	 */
-	public GedcomCreatorStructure(GedcomStore store, String structureName, String... basePath) {
+	public AbstractGedcomStructure(GedcomStore store, String structureName, String... basePath) {
 		
 		v55 = store.getFileVersion().equals("5.5");
 		
-		tree = store.getGedcomTree(structureName);
+		treeHead = store.getGedcomTree(structureName);
 		//Do not add mandatory lines. Just create them when needed
 		//t.addMandatoryChildLines(true);
 		
-		baseNode = tree.followPathCreate(basePath);
+		baseNode = treeHead.followPathCreate(basePath);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param store
+	 * @param structureName
+	 * @param baseNode
+	 */
+	public AbstractGedcomStructure(GedcomStore store, String structureName, 
+			GedcomNode baseNode, String... basePath) {
+		this.baseNode = baseNode.followPathCreate(basePath);
+		
+		String structureName2 = baseNode.getStoreBlock().getStoreStructure().getStructureName();
+		
+		if (!structureName2.equals(structureName)) {
+			throw new GedcomCreatorError("Invalid creation of " + getClass().getSimpleName() + ". " + 
+					"The " + baseNode.getClass().getSimpleName() + " '" + structureName2 + 
+					"' does not match the given structure name '" + structureName + "'");
+		}
+		
+		treeHead = baseNode.getHeadNode();
+		
 	}
 	
 	/**
@@ -65,37 +86,10 @@ public abstract class GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
-	 * @param store
-	 * @param structureName
-	 * @param baseNode
-	 */
-	public GedcomCreatorStructure(GedcomStore store, String structureName, 
-			GedcomNode baseNode, String... basePath) {
-		this.baseNode = baseNode.followPathCreate(basePath);
-		
-		GedcomStoreStructure storeStructure = null;
-		
-		if (baseNode.getStoreBlock() != null) {
-			storeStructure = baseNode.getStoreBlock().getStoreStructure();
-		} else {
-			storeStructure = baseNode.getStoreLine().getStoreStructure();
-		}
-		
-		if (!storeStructure.getStructureName().equals(structureName)) {
-			throw new GedcomCreatorError("Invalid creation of " + getClass().getSimpleName() + ". " + 
-					"The " + baseNode.getClass().getSimpleName() + " '" + storeStructure.getStructureName() + 
-					"' does not match the given structure name '" + structureName + "'");
-		}
-		
-	}
-	
-	/**
-	 * 
-	 * 
 	 * @return
 	 */
-	public GedcomTree getTree() {
-		return tree;
+	public GedcomNode getTree() {
+		return treeHead;
 	}
 	
 	/**
@@ -105,6 +99,27 @@ public abstract class GedcomCreatorStructure {
 	 */
 	protected GedcomNode getBaseNode() {
 		return baseNode;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected GedcomNode followPath(String... path) {
+		return followPath(baseNode, path);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param node
+	 * @param path
+	 * @return
+	 */
+	protected GedcomNode followPath(GedcomNode node, String... path) {
+		return node.followPath(path);
 	}
 	
 	/**

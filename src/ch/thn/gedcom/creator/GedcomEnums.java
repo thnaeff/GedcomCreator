@@ -20,7 +20,7 @@ package ch.thn.gedcom.creator;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorEnums {
+public class GedcomEnums {
 
 	public static enum Sex {
 		MALE("M"), FEMALE("F"), UNKNOWN(null);

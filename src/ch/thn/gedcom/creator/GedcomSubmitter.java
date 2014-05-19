@@ -24,7 +24,7 @@ import ch.thn.gedcom.store.GedcomStore;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
+public class GedcomSubmitter extends AbstractGedcomStructure {
 
 	
 	/**
@@ -33,7 +33,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @param store
 	 * @param id
 	 */
-	public GedcomCreatorSubmitter(GedcomStore store, String id) {
+	public GedcomSubmitter(GedcomStore store, String id) {
 		super(store, "SUBMITTER_RECORD", "SUBM");
 		
 		if (!setId(id)) {
@@ -49,7 +49,7 @@ public class GedcomCreatorSubmitter extends GedcomCreatorStructure {
 	 * @param store
 	 * @param node
 	 */
-	public GedcomCreatorSubmitter(GedcomStore store, GedcomNode node) {
+	public GedcomSubmitter(GedcomStore store, GedcomNode node) {
 		super(store, "SUBMITTER_RECORD", node, "SUBM");
 	}
 	

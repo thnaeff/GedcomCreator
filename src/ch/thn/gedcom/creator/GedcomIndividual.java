@@ -19,11 +19,13 @@ package ch.thn.gedcom.creator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.creator.GedcomCreatorEnums.NameType;
-import ch.thn.gedcom.creator.GedcomCreatorEnums.Sex;
-import ch.thn.gedcom.creator.GedcomCreatorEnums.YesNo;
+import ch.thn.gedcom.creator.GedcomEnums.NameType;
+import ch.thn.gedcom.creator.GedcomEnums.Sex;
+import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomAccessError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
@@ -32,15 +34,15 @@ import ch.thn.gedcom.store.GedcomStore;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorIndividual extends GedcomCreatorStructure {
+public class GedcomIndividual extends AbstractGedcomStructure {
 	
 	/**
-	 * An INDIVIDUAL_RECORD
+	 * A new INDIVIDUAL_RECORD with the given ID
 	 * 
 	 * @param store
 	 * @param id
 	 */
-	public GedcomCreatorIndividual(GedcomStore store, String id) {
+	public GedcomIndividual(GedcomStore store, String id) {
 		super(store, "INDIVIDUAL_RECORD", "INDI");
 		
 		if (!setId(id)) {
@@ -50,12 +52,14 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * Creates a new individual using the given gedcom node containing the 
+	 * INDIVIDUAL_RECORD structure. The given structure at least has to include the 
+	 * INDI tag line.
 	 * 
 	 * @param store
 	 * @param node
 	 */
-	public GedcomCreatorIndividual(GedcomStore store, GedcomNode node) {
+	public GedcomIndividual(GedcomStore store, GedcomNode node) {
 		super(store, "INDIVIDUAL_RECORD", node, "INDI");
 	}
 	
@@ -75,7 +79,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * Returns the XRef ID of this individual
 	 * 
 	 * @return
 	 */
@@ -399,6 +403,20 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	
 	/**
 	 * 
+	 * 
+	 * @return
+	 */
+	public List<String> getNames() {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfNames();
+		while (count > 0) {
+			result.add(getName(--count));
+		}
+		return result;
+	}
+	
+	/**
+	 * 
 	 * @param index
 	 * @return
 	 */
@@ -668,7 +686,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * 
+	 * Removes the ADDR part of the address structure
 	 * 
 	 * @param index
 	 * @return
@@ -678,7 +696,7 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	}
 	
 	/**
-	 * An additional method to remove the whole address structure, including PHON, EMAIL, etc.
+	 * Removes the whole address structure
 	 * 
 	 * @param index
 	 * @return
@@ -695,6 +713,20 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getAddress(int index) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public List<String> getAddresses() {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfAddresses();
+		while (count > 0) {
+			result.add(getAddress(--count));
+		}
+		return result;
 	}
 	
 	/**
@@ -821,6 +853,23 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param index
+	 * @return
+	 */
+	public List<String> getPhones(int index) {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfPhones(index);
+		GedcomNode node = followPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		
+		while (count > 0) {
+			result.add(getValue(node, "PHON" + GedcomNode.PATH_OPTION_DELIMITER + (--count)));
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
 	 * @param phoneIndex
 	 * @return
 	 */
@@ -851,6 +900,23 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 		}
 		
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + emailIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getEMails(int index) {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfPhones(index);
+		GedcomNode node = followPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		
+		while (count > 0) {
+			result.add(getValue(node, "EMAIL" + GedcomNode.PATH_OPTION_DELIMITER + (--count)));
+		}
+		return result;
 	}
 	
 	/**
@@ -893,6 +959,23 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 * 
 	 * 
 	 * @param index
+	 * @return
+	 */
+	public List<String> getFaxes(int index) {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfPhones(index);
+		GedcomNode node = followPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		
+		while (count > 0) {
+			result.add(getValue(node, "FAX" + GedcomNode.PATH_OPTION_DELIMITER + (--count)));
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
 	 * @param faxIndex
 	 * @return
 	 */
@@ -919,6 +1002,23 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public String getWebsite(int index, int wwwIndex) {
 		return getValue("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getWebsites(int index) {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfPhones(index);
+		GedcomNode node = followPath("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
+		
+		while (count > 0) {
+			result.add(getValue(node, "WWW" + GedcomNode.PATH_OPTION_DELIMITER + (--count)));
+		}
+		return result;
 	}
 	
 	/**
@@ -977,6 +1077,20 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public List<String> getSpouseLinks() {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfSpouseLinks();
+		while (count > 0) {
+			result.add(getSpouseLink(--count));
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @param index
 	 * @return
 	 */
@@ -1030,6 +1144,20 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public List<String> getChildLinks() {
+		LinkedList<String> result = new LinkedList<>();
+		int count = getNumberOfChildLinks();
+		while (count > 0) {
+			result.add(getChildLink(--count));
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * 
 	 * @param index
 	 * @return
 	 */
@@ -1045,6 +1173,12 @@ public class GedcomCreatorIndividual extends GedcomCreatorStructure {
 	 */
 	public int getNumberOfChildLinks() {
 		return getNumberOfLines("CHILD_TO_FAMILY_LINK");
+	}
+	
+	
+	@Override
+	public String toString() {
+		return getId() + ": " + getName(0);
 	}
 	
 }

@@ -23,7 +23,7 @@ import ch.thn.gedcom.store.GedcomStore;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorEOF extends GedcomCreatorStructure {
+public class GedcomEOF extends AbstractGedcomStructure {
 
 	
 	/**
@@ -31,7 +31,7 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	 * 
 	 * @param store
 	 */
-	public GedcomCreatorEOF(GedcomStore store) {
+	public GedcomEOF(GedcomStore store) {
 		super(store, "END_OF_FILE");
 		
 		createAndSet(new GedcomDataEmpty(false, "TRLR"));
@@ -43,7 +43,7 @@ public class GedcomCreatorEOF extends GedcomCreatorStructure {
 	 * @param store
 	 * @param node
 	 */
-	public GedcomCreatorEOF(GedcomStore store, GedcomNode node) {
+	public GedcomEOF(GedcomStore store, GedcomNode node) {
 		super(store, "END_OF_FILE structures", node, "TRLR");
 	}
 	

@@ -23,7 +23,7 @@ import ch.thn.gedcom.store.GedcomStore;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorHeader extends GedcomCreatorStructure {
+public class GedcomHeader extends AbstractGedcomStructure {
 
 	
 	/**
@@ -31,7 +31,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * 
 	 * @param store
 	 */
-	public GedcomCreatorHeader(GedcomStore store) {
+	public GedcomHeader(GedcomStore store) {
 		super(store, "HEADER", "HEAD");
 				
 	}
@@ -42,7 +42,7 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	 * @param store
 	 * @param node
 	 */
-	public GedcomCreatorHeader(GedcomStore store, GedcomNode node) {
+	public GedcomHeader(GedcomStore store, GedcomNode node) {
 		super(store, "HEADER", node, "HEAD");
 	}
 	
@@ -131,9 +131,9 @@ public class GedcomCreatorHeader extends GedcomCreatorStructure {
 	/**
 	 * 
 	 * 
-	 * @param systemId
-	 * @param productName
-	 * @param businessName
+	 * @param systemId SOUR
+	 * @param productName NAME
+	 * @param businessName CORP
 	 * @return
 	 */
 	public boolean setSource(String systemId, String productName, String businessName) {

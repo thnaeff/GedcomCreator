@@ -16,7 +16,10 @@
  */
 package ch.thn.gedcom.creator;
 
-import ch.thn.gedcom.creator.GedcomCreatorEnums.YesNo;
+import java.util.LinkedList;
+import java.util.List;
+
+import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -24,7 +27,7 @@ import ch.thn.gedcom.store.GedcomStore;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomCreatorFamily extends GedcomCreatorStructure {
+public class GedcomFamily extends AbstractGedcomStructure {
 
 	
 	/**
@@ -33,7 +36,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @param store
 	 * @param id
 	 */
-	public GedcomCreatorFamily(GedcomStore store, String id) {
+	public GedcomFamily(GedcomStore store, String id) {
 		super(store, "FAM_RECORD", "FAM");
 		
 		if (!setId(id)) {
@@ -48,7 +51,7 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 * @param store
 	 * @param node
 	 */
-	public GedcomCreatorFamily(GedcomStore store, GedcomNode node) {
+	public GedcomFamily(GedcomStore store, GedcomNode node) {
 		super(store, "FAM_RECORD", node, "FAM");
 	}
 	
@@ -65,6 +68,15 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 		}
 		
 		return createAndSet(new GedcomXRef(false, id));
+	}
+	
+	/**
+	 * Returns the XRef ID of this family
+	 * 
+	 * @return
+	 */
+	public String getId() {
+		return getXRef();
 	}
 	
 	/**
@@ -155,6 +167,20 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 	 */
 	public String getChildLink(int index) {
 		return getXRef("CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public List<String> getChildLinks() {
+		LinkedList<String> result = new LinkedList<String>();
+		int count = getNumberOfChildren();
+		while (count > 0) {
+			result.add(getChildLink(--count));
+		}
+		return result;
 	}
 	
 	/**
@@ -283,5 +309,10 @@ public class GedcomCreatorFamily extends GedcomCreatorStructure {
 		return remove("FAMILY_EVENT_STRUCTURE;DIV", "DIV", (!isV55() ? "FAMILY_EVENT_DETAIL" : null), "EVENT_DETAIL", "DATE");
 	}
 	
+	
+	@Override
+	public String toString() {
+		return getId() + ": " + getHusbandLink() + ", " + getWifeLink();
+	}
 
 }
