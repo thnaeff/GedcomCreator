@@ -29,6 +29,9 @@ import ch.thn.gedcom.creator.structures.GedcomSubmitter;
 import ch.thn.gedcom.data.GedcomNode;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 
 /**
  * This class can be used to collect all the gedcom creator structures and it provides 
@@ -40,7 +43,7 @@ import com.google.common.collect.HashMultimap;
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
-public class GedcomStructureStorage {
+public class GedcomCreatorStructureStorage {
 	
 	private HashMap<String, GedcomEOF> eofs = null;
 	private HashMap<String, GedcomHeader> headers = null;
@@ -62,7 +65,7 @@ public class GedcomStructureStorage {
 	/**
 	 * 
 	 */
-	public GedcomStructureStorage() {
+	public GedcomCreatorStructureStorage() {
 		
 		eofs = new HashMap<>();
 		headers = new HashMap<>();
@@ -206,6 +209,105 @@ public class GedcomStructureStorage {
 	 */
 	public GedcomIndividual getIndividual(String individualId) {
 		return individuals.get(individualId);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param eof
+	 * @return
+	 */
+	public boolean hasEOF(GedcomEOF eof) {
+		return eofs.values().contains(eof);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param header
+	 * @return
+	 */
+	public boolean hasHeader(GedcomHeader header) {
+		return headers.values().contains(header);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param submitter
+	 * @return
+	 */
+	public boolean hasSubmitter(GedcomSubmitter submitter) {
+		return submitters.values().contains(submitter);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param family
+	 * @return
+	 */
+	public boolean hasFamily(GedcomFamily family) {
+		return families.values().contains(family);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param individual
+	 */
+	public boolean hasIndividual(GedcomIndividual individual) {
+		return individuals.values().contains(individual);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param eofId
+	 * @return
+	 */
+	public boolean hasEOF(String eofId) {
+		return eofs.containsKey(eofId);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param headerId
+	 * @return
+	 */
+	public boolean hasHeader(String headerId) {
+		return headers.containsKey(headerId);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param submitterId
+	 * @return
+	 */
+	public boolean hasSubmitter(String submitterId) {
+		return submitters.containsKey(submitterId);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param familyId
+	 * @return
+	 */
+	public boolean hasFamily(String familyId) {
+		return families.containsKey(familyId);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param individualId
+	 * @return
+	 */
+	public boolean hasIndividual(String individualId) {
+		return individuals.containsKey(individualId);
 	}
 	
 	/**
@@ -357,6 +459,46 @@ public class GedcomStructureStorage {
 	 */
 	public boolean hasMissingStructures() {
 		return missingIndividuals.size() > 0 || missingFamilies.size() > 0;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param parent1Id
+	 * @param parent2Id
+	 * @return
+	 */
+	public GedcomFamily getFamilyOfParents(String parent1Id, String parent2Id) {
+		Set<GedcomFamily> families1 = getFamiliesOfParent(parent1Id);
+		Set<GedcomFamily> families2 = getFamiliesOfParent(parent2Id);
+		
+		//A comment in the guava docs: 
+		//"I can use intersection as a Set directly, but copying it can be more 
+		//efficient if I use it a lot."
+		SetView<GedcomFamily> view = Sets.intersection(families1, families2);
+		
+		if (view.size() > 1) {
+			throw new GedcomCreatorError("The parents " + parent1Id + " and " + parent2Id + 
+					" have been found as parent in more than one family.");
+		}
+		
+		//Returns the first family, or null if there is none
+		return Iterables.getFirst(view, null);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param parent1
+	 * @param parent2
+	 * @return
+	 */
+	public GedcomFamily getFamilyOfParents(GedcomIndividual parent1, GedcomIndividual parent2) {
+		if (parent1 == null || parent2 == null) {
+			return null;
+		}
+		
+		return getFamilyOfParents(parent1.getId(), parent2.getId());
 	}
 	
 	/**

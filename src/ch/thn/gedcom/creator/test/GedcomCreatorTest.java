@@ -19,7 +19,7 @@ package ch.thn.gedcom.creator.test;
 import java.util.Date;
 
 import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.creator.GedcomStructureStorage;
+import ch.thn.gedcom.creator.GedcomCreatorStructureStorage;
 import ch.thn.gedcom.creator.GedcomEnums.*;
 import ch.thn.gedcom.creator.structures.GedcomEOF;
 import ch.thn.gedcom.creator.structures.GedcomFamily;
@@ -107,7 +107,7 @@ public class GedcomCreatorTest {
 		
 		System.out.println("------");
 		
-		GedcomStructureStorage structureStorage = new GedcomStructureStorage();
+		GedcomCreatorStructureStorage structureStorage = new GedcomCreatorStructureStorage();
 		structureStorage.addIndividual(indi);
 		structureStorage.addFamily(fam);
 		
