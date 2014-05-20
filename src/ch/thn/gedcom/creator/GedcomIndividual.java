@@ -1048,7 +1048,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param familyId
 	 * @return
 	 */
-	public boolean addSpouseLink(String familyId) {
+	public boolean addSpouseFamilyLink(String familyId) {
 		return createAndSet(new GedcomXRef(true, familyId, 
 				"SPOUSE_TO_FAMILY_LINK", "FAMS"));
 	}
@@ -1059,7 +1059,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param familyId
 	 * @return
 	 */
-	public boolean setSpouseLink(int index, String familyId) {
+	public boolean setSpouseFamilyLink(int index, String familyId) {
 		return createAndSet(new GedcomXRef(false, familyId, 
 				"SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS"));
 	}
@@ -1070,7 +1070,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public String getSpouseLink(int index) {
+	public String getSpouseFamilyLink(int index) {
 		return getXRef("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
@@ -1079,11 +1079,11 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * 
 	 * @return
 	 */
-	public List<String> getSpouseLinks() {
+	public List<String> getSpouseFamilyLinks() {
 		LinkedList<String> result = new LinkedList<>();
-		int count = getNumberOfSpouseLinks();
+		int count = getNumberOfSpouseFamilyLinks();
 		while (count > 0) {
-			result.add(getSpouseLink(--count));
+			result.add(getSpouseFamilyLink(--count));
 		}
 		return result;
 	}
@@ -1094,7 +1094,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public boolean removeSpouseLink(int index) {
+	public boolean removeSpouseFamilyLink(int index) {
 		return remove("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
@@ -1105,7 +1105,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public int getNumberOfSpouseLinks() {
+	public int getNumberOfSpouseFamilyLinks() {
 		return getNumberOfLines("SPOUSE_TO_FAMILY_LINK");
 	}
 	
@@ -1115,7 +1115,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param chilId
 	 * @return
 	 */
-	public boolean addChildLink(String chilId) {
+	public boolean addChildFamilyLink(String chilId) {
 		return createAndSet(new GedcomXRef(true, chilId, 
 				"CHILD_TO_FAMILY_LINK", "FAMC"));
 	}
@@ -1126,7 +1126,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param chilId
 	 * @return
 	 */
-	public boolean setChildLink(int index, String chilId) {
+	public boolean setChildFamilyLink(int index, String chilId) {
 		return createAndSet(new GedcomXRef(false, chilId, 
 				"CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC"));
 	}
@@ -1137,7 +1137,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public String getChildLink(int index) {
+	public String getChildFamilyLink(int index) {
 		return getXRef("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
 	}
 	
@@ -1146,11 +1146,11 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * 
 	 * @return
 	 */
-	public List<String> getChildLinks() {
+	public List<String> getChildFamilyLinks() {
 		LinkedList<String> result = new LinkedList<>();
-		int count = getNumberOfChildLinks();
+		int count = getNumberOfChildFamilyLinks();
 		while (count > 0) {
-			result.add(getChildLink(--count));
+			result.add(getChildFamilyLink(--count));
 		}
 		return result;
 	}
@@ -1161,7 +1161,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public boolean removeChildLink(int index) {
+	public boolean removeChildFamilyLink(int index) {
 		return remove("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
 	}
 	
@@ -1171,7 +1171,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @param index
 	 * @return
 	 */
-	public int getNumberOfChildLinks() {
+	public int getNumberOfChildFamilyLinks() {
 		return getNumberOfLines("CHILD_TO_FAMILY_LINK");
 	}
 	
