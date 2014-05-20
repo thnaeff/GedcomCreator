@@ -60,6 +60,7 @@ public class GedcomCreatorStructureStorage {
 	private ArrayList<String> missingIndividuals = null;
 	private ArrayList<String> missingFamilies = null;
 	
+	private boolean structuresModified = false;
 	private boolean throwExceptionOnMissingStructures = false;
 	
 	/**
@@ -90,6 +91,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param eof
 	 */
 	public void addEOF(String eofId, GedcomEOF eof) {
+		structuresModified = true;
 		eofs.put(eofId, eof);
 	}
 	
@@ -100,6 +102,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param header
 	 */
 	public void addHeader(String headerId, GedcomHeader header) {
+		structuresModified = true;
 		headers.put(headerId, header);
 	}
 	
@@ -110,6 +113,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param submitter
 	 */
 	public void addSubmitter(String submitterId, GedcomSubmitter submitter) {
+		structuresModified = true;
 		submitters.put(submitterId, submitter);
 	}
 	
@@ -125,6 +129,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param family
 	 */
 	public void addFamily(String familyId, GedcomFamily family) {
+		structuresModified = true;
 		families.put(familyId, family);
 	}
 	
@@ -149,6 +154,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param individual
 	 */
 	public void addIndividual(String individualId, GedcomIndividual individual) {
+		structuresModified = true;
 		individuals.put(individualId, individual);
 	}
 	
@@ -317,6 +323,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomEOF removeEOF(String eofId) {
+		structuresModified = true;
 		return eofs.remove(eofId);
 	}
 	
@@ -327,6 +334,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomHeader removeHeader(String headerId) {
+		structuresModified = true;
 		return headers.remove(headerId);
 	}
 	
@@ -337,6 +345,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomSubmitter removeSubmitter(String submitterId) {
+		structuresModified = true;
 		return submitters.remove(submitterId);
 	}
 	
@@ -347,6 +356,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomFamily removeFamily(String familyId) {
+		structuresModified = true;
 		GedcomFamily removed = families.remove(familyId);
 		
 		if (removed != null) {
@@ -375,6 +385,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomIndividual removeIndividual(String individualId) {
+		structuresModified = true;
 		GedcomIndividual removed = individuals.remove(individualId);
 		
 		if (removed != null) {
@@ -504,6 +515,61 @@ public class GedcomCreatorStructureStorage {
 	/**
 	 * 
 	 * 
+	 * @return
+	 */
+	public int getEOFCount() {
+		return eofs.size();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getHeaderCount() {
+		return headers.size();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getSubmitterCount() {
+		return submitters.size();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getFamilyCount() {
+		return families.size();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getIndividualCount() {
+		return individuals.size();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getTotalStructureCount() {
+		return getEOFCount() + getHeaderCount() + getSubmitterCount() + 
+				getFamilyCount() + getIndividualCount();
+	}
+	
+	/**
+	 * 
+	 * 
 	 */
 	public void clearAll() {
 		eofs.clear();
@@ -528,6 +594,16 @@ public class GedcomCreatorStructureStorage {
 		
 		missingFamilies.clear();
 		missingIndividuals.clear();
+	}
+	
+	/**
+	 * Returns <code>true</code> if a structure has been added or removed 
+	 * after the last call to {@link #buildFamilyRelations()}.
+	 * 
+	 * @return
+	 */
+	public boolean structuresModified() {
+		return structuresModified;
 	}
 	
 	/**
@@ -615,6 +691,8 @@ public class GedcomCreatorStructureStorage {
 			
 			
 		}
+		
+		structuresModified = false;
 		
 	}
 

@@ -22,6 +22,7 @@ import java.util.List;
 import ch.thn.gedcom.creator.GedcomCreatorError;
 import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -32,13 +33,13 @@ public class GedcomFamily extends AbstractGedcomStructure {
 
 	
 	/**
-	 * A FAM_RECORD
+	 * A new {@link AbstractGedcomStructure#FAM_RECORD} with the given ID
 	 * 
 	 * @param store
 	 * @param id
 	 */
 	public GedcomFamily(GedcomStore store, String id) {
-		super(store, "FAM_RECORD", "FAM");
+		super(store, FAM_RECORD, "FAM");
 		
 		if (!setId(id)) {
 			throw new GedcomCreatorError("Failed to create family with ID " + 
@@ -47,13 +48,19 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * 
+	 * Creates a new individual using the given gedcom head node ({@link GedcomTree}) 
+	 * which has to be a {@link AbstractGedcomStructure#FAM_RECORD} structure.
 	 * 
 	 * @param store
-	 * @param node
+	 * @param gedcomHeadNode
 	 */
-	public GedcomFamily(GedcomStore store, GedcomNode node) {
-		super(store, "FAM_RECORD", node, "FAM");
+	public GedcomFamily(GedcomStore store, GedcomTree gedcomHeadNode) {
+		super(store, FAM_RECORD, gedcomHeadNode, "FAM");
+	}
+	
+	@Override
+	public String getStructureName() {
+		return AbstractGedcomStructure.FAM_RECORD;
 	}
 	
 	/**

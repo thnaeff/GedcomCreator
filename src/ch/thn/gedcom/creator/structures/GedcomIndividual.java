@@ -29,6 +29,7 @@ import ch.thn.gedcom.creator.GedcomEnums.Sex;
 import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomAccessError;
 import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -38,13 +39,13 @@ import ch.thn.gedcom.store.GedcomStore;
 public class GedcomIndividual extends AbstractGedcomStructure {
 	
 	/**
-	 * A new INDIVIDUAL_RECORD with the given ID
+	 * A new {@link AbstractGedcomStructure#INDIVIDUAL_RECORD} with the given ID
 	 * 
 	 * @param store
 	 * @param id
 	 */
 	public GedcomIndividual(GedcomStore store, String id) {
-		super(store, "INDIVIDUAL_RECORD", "INDI");
+		super(store, INDIVIDUAL_RECORD, "INDI");
 		
 		if (!setId(id)) {
 			throw new GedcomCreatorError("Failed to create individual with ID " + 
@@ -53,15 +54,19 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * Creates a new individual using the given gedcom node containing the 
-	 * INDIVIDUAL_RECORD structure. The given structure at least has to include the 
-	 * INDI tag line.
+	 * Creates a new individual using the given gedcom head node ({@link GedcomTree}) 
+	 * which has to be a {@link AbstractGedcomStructure#INDIVIDUAL_RECORD} structure.
 	 * 
 	 * @param store
-	 * @param node
+	 * @param gedcomHeadNode
 	 */
-	public GedcomIndividual(GedcomStore store, GedcomNode node) {
-		super(store, "INDIVIDUAL_RECORD", node, "INDI");
+	public GedcomIndividual(GedcomStore store, GedcomTree gedcomHeadNode) {
+		super(store, INDIVIDUAL_RECORD, gedcomHeadNode, "INDI");
+	}
+	
+	@Override
+	public String getStructureName() {
+		return AbstractGedcomStructure.INDIVIDUAL_RECORD;
 	}
 	
 	/**

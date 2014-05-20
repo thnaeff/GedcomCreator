@@ -16,7 +16,7 @@
  */
 package ch.thn.gedcom.creator.structures;
 
-import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -27,24 +27,30 @@ public class GedcomEOF extends AbstractGedcomStructure {
 
 	
 	/**
-	 * A END_OF_FILE structures
+	 * A new {@link AbstractGedcomStructure#END_OF_FILE} with the given ID
 	 * 
 	 * @param store
 	 */
 	public GedcomEOF(GedcomStore store) {
-		super(store, "END_OF_FILE");
+		super(store, END_OF_FILE);
 		
 		createAndSet(new GedcomDataEmpty(false, "TRLR"));
 	}
 	
 	/**
-	 * 
+	 * Creates a new individual using the given gedcom head node ({@link GedcomTree}) 
+	 * which has to be a {@link AbstractGedcomStructure#END_OF_FILE} structure.
 	 * 
 	 * @param store
-	 * @param node
+	 * @param gedcomHeadNode
 	 */
-	public GedcomEOF(GedcomStore store, GedcomNode node) {
-		super(store, "END_OF_FILE structures", node, "TRLR");
+	public GedcomEOF(GedcomStore store, GedcomTree gedcomHeadNode) {
+		super(store, END_OF_FILE, gedcomHeadNode, "TRLR");
+	}
+	
+	@Override
+	public String getStructureName() {
+		return AbstractGedcomStructure.END_OF_FILE;
 	}
 	
 	/**

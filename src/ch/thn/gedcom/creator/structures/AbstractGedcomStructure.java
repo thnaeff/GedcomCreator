@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import ch.thn.gedcom.creator.GedcomCreatorError;
 import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
 import ch.thn.gedcom.store.GedcomStore;
 
@@ -28,6 +29,12 @@ import ch.thn.gedcom.store.GedcomStore;
  *
  */
 public abstract class AbstractGedcomStructure {
+	
+	public static final String END_OF_FILE = "END_OF_FILE";
+	public static final String FAM_RECORD = "FAM_RECORD";
+	public static final String HEADER = "HEADER";
+	public static final String INDIVIDUAL_RECORD = "INDIVIDUAL_RECORD";
+	public static final String SUBMITTER_RECORD = "SUBMITTER_RECORD";
 		
 	private GedcomNode treeHead = null;
 	protected GedcomNode baseNode = null;
@@ -35,7 +42,7 @@ public abstract class AbstractGedcomStructure {
 	private boolean v55 = false;
 	
 	/**
-	 * 
+	 * Creates a new gedcom node from the store using the given structure name
 	 * 
 	 * @param store
 	 * @param structureName
@@ -53,27 +60,37 @@ public abstract class AbstractGedcomStructure {
 	}
 	
 	/**
-	 * 
+	 * Uses the given gedcom base node and verifies it if it matches the given 
+	 * structure name
 	 * 
 	 * @param store
 	 * @param structureName
-	 * @param baseNode
+	 * @param gedcomHeadNode The head node of a gedcom tree is a {@link GedcomTree} 
+	 * object
+	 * @param basePath
 	 */
 	public AbstractGedcomStructure(GedcomStore store, String structureName, 
-			GedcomNode baseNode, String... basePath) {
-		this.baseNode = baseNode.followPathCreate(basePath);
+			GedcomTree gedcomHeadNode, String... basePath) {
+		this.baseNode = gedcomHeadNode.followPathCreate(basePath);
 		
-		String structureName2 = baseNode.getStoreBlock().getStoreStructure().getStructureName();
+		String structureName2 = gedcomHeadNode.getStoreBlock().getStoreStructure().getStructureName();
 		
 		if (!structureName2.equals(structureName)) {
 			throw new GedcomCreatorError("Invalid creation of " + getClass().getSimpleName() + ". " + 
-					"The " + baseNode.getClass().getSimpleName() + " '" + structureName2 + 
+					"The " + gedcomHeadNode.getClass().getSimpleName() + " '" + structureName2 + 
 					"' does not match the given structure name '" + structureName + "'");
 		}
 		
-		treeHead = baseNode.getHeadNode();
+		treeHead = gedcomHeadNode.getHeadNode();
 		
 	}
+	
+	/**
+	 * Returns the structure name which matches the used structure
+	 * 
+	 * @return
+	 */
+	public abstract String getStructureName();
 	
 	/**
 	 * Returns <code>true</code> if the loaded gedcom grammar file is version 5.5

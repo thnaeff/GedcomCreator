@@ -16,7 +16,7 @@
  */
 package ch.thn.gedcom.creator.structures;
 
-import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 
 /**
@@ -27,23 +27,29 @@ public class GedcomHeader extends AbstractGedcomStructure {
 
 	
 	/**
-	 * A HEADER structures
+	 * A new {@link AbstractGedcomStructure#HEADER} with the given ID
 	 * 
 	 * @param store
 	 */
 	public GedcomHeader(GedcomStore store) {
-		super(store, "HEADER", "HEAD");
+		super(store, HEADER, "HEAD");
 				
 	}
 	
 	/**
-	 * 
+	 * Creates a new individual using the given gedcom head node ({@link GedcomTree}) 
+	 * which has to be a {@link AbstractGedcomStructure#HEADER} structure.
 	 * 
 	 * @param store
-	 * @param node
+	 * @param gedcomHeadNode
 	 */
-	public GedcomHeader(GedcomStore store, GedcomNode node) {
-		super(store, "HEADER", node, "HEAD");
+	public GedcomHeader(GedcomStore store, GedcomTree gedcomHeadNode) {
+		super(store, HEADER, gedcomHeadNode, "HEAD");
+	}
+	
+	@Override
+	public String getStructureName() {
+		return AbstractGedcomStructure.HEADER;
 	}
 	
 	/**

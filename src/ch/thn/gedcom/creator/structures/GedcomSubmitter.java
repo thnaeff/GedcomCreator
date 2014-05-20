@@ -17,7 +17,7 @@
 package ch.thn.gedcom.creator.structures;
 
 import ch.thn.gedcom.creator.GedcomCreatorError;
-import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
 
 
@@ -29,13 +29,13 @@ public class GedcomSubmitter extends AbstractGedcomStructure {
 
 	
 	/**
-	 * A SUBMITTER_RECORD
+	 * A new {@link AbstractGedcomStructure#SUBMITTER_RECORD} with the given ID
 	 * 
 	 * @param store
 	 * @param id
 	 */
 	public GedcomSubmitter(GedcomStore store, String id) {
-		super(store, "SUBMITTER_RECORD", "SUBM");
+		super(store, SUBMITTER_RECORD, "SUBM");
 		
 		if (!setId(id)) {
 			throw new GedcomCreatorError("Failed to create submitter record with ID " + 
@@ -45,13 +45,19 @@ public class GedcomSubmitter extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * 
+	 * Creates a new individual using the given gedcom head node ({@link GedcomTree}) 
+	 * which has to be a {@link AbstractGedcomStructure#SUBMITTER_RECORD} structure.
 	 * 
 	 * @param store
-	 * @param node
+	 * @param gedcomHeadNode
 	 */
-	public GedcomSubmitter(GedcomStore store, GedcomNode node) {
-		super(store, "SUBMITTER_RECORD", node, "SUBM");
+	public GedcomSubmitter(GedcomStore store, GedcomTree gedcomHeadNode) {
+		super(store, SUBMITTER_RECORD, gedcomHeadNode, "SUBM");
+	}
+	
+	@Override
+	public String getStructureName() {
+		return AbstractGedcomStructure.SUBMITTER_RECORD;
 	}
 	
 	/**
