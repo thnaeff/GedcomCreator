@@ -14,10 +14,11 @@
  * limitations under the License.
  * 
  */
-package ch.thn.gedcom.creator;
+package ch.thn.gedcom.creator.structures;
 
 import java.util.Arrays;
 
+import ch.thn.gedcom.creator.GedcomCreatorError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
 import ch.thn.gedcom.store.GedcomStore;

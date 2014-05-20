@@ -17,11 +17,21 @@
 package ch.thn.gedcom.creator;
 
 /**
+ * 
+ * 
+ *
  * @author Thomas Naeff (github.com/thnaeff)
  *
  */
 public class GedcomEnums {
 
+	/**
+	 * 
+	 * 
+	 *
+	 * @author Thomas Naeff (github.com/thnaeff)
+	 *
+	 */
 	public static enum Sex {
 		MALE("M"), FEMALE("F"), UNKNOWN(null);
 		
@@ -36,6 +46,13 @@ public class GedcomEnums {
 		}
 	};
 	
+	/**
+	 * 
+	 * 
+	 *
+	 * @author Thomas Naeff (github.com/thnaeff)
+	 *
+	 */
 	public static enum YesNo {
 		YES("Y"), NO(null);
 		
@@ -50,6 +67,13 @@ public class GedcomEnums {
 		}
 	};
 	
+	/**
+	 * 
+	 * 
+	 *
+	 * @author Thomas Naeff (github.com/thnaeff)
+	 *
+	 */
 	public static enum NameType {
 		UNSPECIFIED(null), AKA("aka"), BIRTH("birth"), IMMIGRANT("immigrant"), MAIDEN("maiden"), MARRIED("married");
 		

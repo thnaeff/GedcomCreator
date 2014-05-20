@@ -19,10 +19,11 @@ package ch.thn.gedcom.creator.test;
 import java.util.Date;
 
 import ch.thn.gedcom.GedcomFormatter;
-import ch.thn.gedcom.creator.GedcomEOF;
-import ch.thn.gedcom.creator.GedcomFamily;
-import ch.thn.gedcom.creator.GedcomIndividual;
+import ch.thn.gedcom.creator.GedcomStructureStorage;
 import ch.thn.gedcom.creator.GedcomEnums.*;
+import ch.thn.gedcom.creator.structures.GedcomEOF;
+import ch.thn.gedcom.creator.structures.GedcomFamily;
+import ch.thn.gedcom.creator.structures.GedcomIndividual;
 import ch.thn.gedcom.printer.GedcomStructureTextPrinter;
 import ch.thn.gedcom.printer.GedcomStructureTreePrinter;
 import ch.thn.gedcom.store.GedcomParseException;
@@ -68,9 +69,9 @@ public class GedcomCreatorTest {
 		indi.addAddress("street21", "street22", "city2", "post2", "country2", 
 				new String[] {"phone21", "phone22", "phone23"}, new String[] {"email21", "email22"}, 
 				new String[] {"fax2"}, new String[] {"www2"});
-		indi.addSpouseLink("spouse1");
-		indi.addSpouseLink("spouse2");
-		indi.addChildLink("child");
+		indi.addSpouseFamilyLink("spouse1");
+		indi.addSpouseFamilyLink("spouse2");
+		indi.addChildFamilyLink("child");
 		indi.addNote("A Note");
 		indi.addNote("Another Note");
 		indi.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
@@ -103,6 +104,17 @@ public class GedcomCreatorTest {
 		
 		GedcomEOF eof = new GedcomEOF(store);
 		System.out.println(textPrinter.print(eof.getTree()));
+		
+		System.out.println("------");
+		
+		GedcomStructureStorage structureStorage = new GedcomStructureStorage();
+		structureStorage.addIndividual(indi);
+		structureStorage.addFamily(fam);
+		
+		structureStorage.buildFamilyRelations();
+		
+		structureStorage.removeFamily(fam);
+		structureStorage.removeIndividual(indi);
 		
 	}
 

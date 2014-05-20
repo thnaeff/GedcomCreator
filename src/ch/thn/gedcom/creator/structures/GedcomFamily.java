@@ -14,11 +14,12 @@
  * limitations under the License.
  * 
  */
-package ch.thn.gedcom.creator;
+package ch.thn.gedcom.creator.structures;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import ch.thn.gedcom.creator.GedcomCreatorError;
 import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
@@ -210,7 +211,7 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	 * @return
 	 */
 	public boolean setMarried(boolean isMarried, String marriageDate) {
-		GedcomValue marr = new GedcomValue(false, (isMarried ? YesNo.YES.value : null), 
+		GedcomValue marr = new GedcomValue(false, (isMarried ? YesNo.YES.getValue() : null), 
 				"FAMILY_EVENT_STRUCTURE;MARR", "MARR");
 		
 		GedcomValue date = new GedcomValue(false, marriageDate, marr,  
@@ -225,7 +226,7 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	 * @return
 	 */
 	public boolean isMarried() {
-		return YesNo.YES.value.equals(getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
+		return YesNo.YES.getValue().equals(getValue("FAMILY_EVENT_STRUCTURE;MARR", "MARR"));
 	}
 	
 	/**

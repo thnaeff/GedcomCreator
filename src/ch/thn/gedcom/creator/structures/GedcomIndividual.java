@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package ch.thn.gedcom.creator;
+package ch.thn.gedcom.creator.structures;
 
 
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ch.thn.gedcom.GedcomFormatter;
+import ch.thn.gedcom.creator.GedcomCreatorError;
 import ch.thn.gedcom.creator.GedcomEnums.NameType;
 import ch.thn.gedcom.creator.GedcomEnums.Sex;
 import ch.thn.gedcom.creator.GedcomEnums.YesNo;
@@ -94,7 +95,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @return
 	 */
 	public boolean setSex(Sex sex) {
-		return createAndSet(new GedcomValue(false, (sex == null ? null : sex.value), 
+		return createAndSet(new GedcomValue(false, (sex == null ? null : sex.getValue()), 
 				"SEX"));
 	}
 	
@@ -115,9 +116,9 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	public Sex getSex() {
 		String sex = getValue("SEX");
 		
-		if (Sex.MALE.value.equals(sex)) {
+		if (Sex.MALE.getValue().equals(sex)) {
 			return Sex.MALE;
-		} else if (Sex.FEMALE.value.equals(sex)) {
+		} else if (Sex.FEMALE.getValue().equals(sex)) {
 			return Sex.FEMALE;
 		} else {
 			return Sex.UNKNOWN;
@@ -132,7 +133,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @return
 	 */
 	public boolean setBirth(boolean isBorn, String birthDate) {
-		GedcomValue born = new GedcomValue(false, (isBorn ? YesNo.YES.value : null), 
+		GedcomValue born = new GedcomValue(false, (isBorn ? YesNo.YES.getValue() : null), 
 				"INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT");
 		
 		GedcomValue date = new GedcomValue(false, birthDate, born, 
@@ -149,7 +150,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	public boolean isBorn() {
 		String born = getValue("INDIVIDUAL_EVENT_STRUCTURE;BIRT", "BIRT");
 		
-		if (YesNo.YES.value.equals(born)) {
+		if (YesNo.YES.getValue().equals(born)) {
 			return true;
 		} else {
 			return false;
@@ -193,7 +194,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 * @return
 	 */
 	public boolean setDeath(boolean isDead, String deathDate) {
-		GedcomValue dead = new GedcomValue(false, (isDead ? YesNo.YES.value : null), 
+		GedcomValue dead = new GedcomValue(false, (isDead ? YesNo.YES.getValue() : null), 
 				"INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT");
 		
 		GedcomValue date = new GedcomValue(false, deathDate, dead, 
@@ -210,7 +211,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	public boolean isDead() {
 		String born = getValue("INDIVIDUAL_EVENT_STRUCTURE;DEAT", "DEAT");
 		
-		if (YesNo.YES.value.equals(born)) {
+		if (YesNo.YES.getValue().equals(born)) {
 			return true;
 		} else {
 			return false;
@@ -334,7 +335,7 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 		GedcomValue surn = new GedcomValue(add, name, n, 
 				(!isV55() ? "PERSONAL_NAME_PIECES" : null), "SURN");
 		
-		GedcomValue type = new GedcomValue(add, (nameType == null ? null : nameType.value), n, 
+		GedcomValue type = new GedcomValue(add, (nameType == null ? null : nameType.getValue()), n, 
 					"TYPE");
 		
 		return createAndSet(n, givn, surn, (!isV55() ? type : null));
@@ -476,15 +477,15 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 		
 		String type = getValue("PERSONAL_NAME_STRUCTURE" + GedcomNode.PATH_OPTION_DELIMITER + index, "NAME", "TYPE");
 		
-		if (NameType.MAIDEN.value.equals(type)) {
+		if (NameType.MAIDEN.getValue().equals(type)) {
 			return NameType.MAIDEN;
-		} else if (NameType.MARRIED.value.equals(type)) {
+		} else if (NameType.MARRIED.getValue().equals(type)) {
 			return NameType.MARRIED;
-		} else if (NameType.BIRTH.value.equals(type)) {
+		} else if (NameType.BIRTH.getValue().equals(type)) {
 			return NameType.BIRTH;
-		} else if (NameType.AKA.value.equals(type)) {
+		} else if (NameType.AKA.getValue().equals(type)) {
 			return NameType.AKA;
-		} else if (NameType.IMMIGRANT.value.equals(type)) {
+		} else if (NameType.IMMIGRANT.getValue().equals(type)) {
 			return NameType.IMMIGRANT;
 		} else {
 			return NameType.UNSPECIFIED;

@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package ch.thn.gedcom.creator;
+package ch.thn.gedcom.creator.structures;
 
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.store.GedcomStore;
