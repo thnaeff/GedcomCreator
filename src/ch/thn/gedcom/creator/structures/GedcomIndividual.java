@@ -1118,22 +1118,22 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	/**
 	 * Links this individual as child to its family
 	 * 
-	 * @param chilId
+	 * @param familyId
 	 * @return
 	 */
-	public boolean addChildFamilyLink(String chilId) {
-		return createAndSet(new GedcomXRef(true, chilId, 
+	public boolean addChildFamilyLink(String familyId) {
+		return createAndSet(new GedcomXRef(true, familyId, 
 				"CHILD_TO_FAMILY_LINK", "FAMC"));
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param chilId
+	 * @param familyId
 	 * @return
 	 */
-	public boolean setChildFamilyLink(int index, String chilId) {
-		return createAndSet(new GedcomXRef(false, chilId, 
+	public boolean setChildFamilyLink(int index, String familyId) {
+		return createAndSet(new GedcomXRef(false, familyId, 
 				"CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC"));
 	}
 	
