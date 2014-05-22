@@ -85,6 +85,141 @@ public class GedcomCreatorStructureStorage {
 	}
 	
 	/**
+	 * Adds all the structures of the the given structure storage to this structure 
+	 * storage.
+	 * 
+	 * @param structureStorage
+	 */
+	public void combine(GedcomCreatorStructureStorage structureStorage) {
+		combine(structureStorage, true, true, true, true, true);
+	}
+	
+	/**
+	 * Adds all the structures of the the given structure storage to this structure 
+	 * storage. The available flags can be used to choose the structures which 
+	 * should be added.
+	 * 
+	 * @param structureStorage
+	 * @param eof
+	 * @param header
+	 * @param submitter
+	 * @param family
+	 * @param individual
+	 */
+	public void combine(GedcomCreatorStructureStorage structureStorage, 
+			boolean eof, boolean header, boolean submitter, boolean family, boolean individual) {
+		if (eof) {
+			eofs.putAll(structureStorage.getEOFs());
+		}
+		
+		if (header) {
+			headers.putAll(structureStorage.getHeaders());
+		}
+		
+		if (submitter) {
+			submitters.putAll(structureStorage.getSubmitters());
+		}
+		
+		if (family) {
+			families.putAll(structureStorage.getFamilies());
+		}
+		
+		if (individual) {
+			individuals.putAll(structureStorage.getIndividualss());
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	protected HashMap<String, GedcomEOF> getEOFs() {
+		return eofs;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	protected HashMap<String, GedcomHeader> getHeaders() {
+		return headers;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	protected HashMap<String, GedcomSubmitter> getSubmitters() {
+		return submitters;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	protected HashMap<String, GedcomFamily> getFamilies() {
+		return families;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	protected HashMap<String, GedcomIndividual> getIndividualss() {
+		return individuals;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Set<String> getEOFIDs() {
+		return eofs.keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Set<String> getHeaderIDs() {
+		return headers.keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Set<String> getSubmitterIDs() {
+		return submitters.keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Set<String> getFamilyIDs() {
+		return families.keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Set<String> getIndividualIDs() {
+		return individuals.keySet();
+	}
+	
+	/**
 	 * 
 	 * 
 	 * @param eofId

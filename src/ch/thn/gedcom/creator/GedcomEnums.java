@@ -33,7 +33,11 @@ public class GedcomEnums {
 	 *
 	 */
 	public static enum Sex {
-		MALE("M"), FEMALE("F"), UNKNOWN(null);
+		/**Male=M*/
+		MALE("M"),
+		/**Female=F*/
+		FEMALE("F"), 
+		UNKNOWN(null);
 		
 		protected String value = null;
 		
