@@ -48,6 +48,11 @@ public class GedcomEnums {
 		public String getValue() {
 			return value;
 		}
+		
+		@Override
+		public String toString() {
+			return value;
+		}
 	};
 	
 	/**
@@ -67,6 +72,11 @@ public class GedcomEnums {
 		}
 		
 		public String getValue() {
+			return value;
+		}
+		
+		@Override
+		public String toString() {
 			return value;
 		}
 	};
@@ -90,6 +100,12 @@ public class GedcomEnums {
 		public String getValue() {
 			return value;
 		}
+		
+		@Override
+		public String toString() {
+			return value;
+		}
+		
 	};
 	
 }
