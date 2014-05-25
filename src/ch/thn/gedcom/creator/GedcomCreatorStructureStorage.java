@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ch.thn.gedcom.creator.structures.GedcomEOF;
@@ -31,6 +32,7 @@ import ch.thn.gedcom.data.GedcomNode;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
@@ -287,11 +289,11 @@ public class GedcomCreatorStructureStorage {
 			}
 		}
 		
-		familiesOfParent.put(husbLink, family);
-		familiesOfParent.put(wifeLink, family);
+		putIfNotNull(familiesOfParent, husbLink, family);
+		putIfNotNull(familiesOfParent, wifeLink, family);
 		
 		structuresModified = true;
-		families.put(familyId, family);
+		putIfNotNull(families, familyId, family);
 		
 		return true;
 	}
@@ -325,7 +327,7 @@ public class GedcomCreatorStructureStorage {
 		}
 		
 		structuresModified = true;
-		individuals.put(individualId, individual);
+		putIfNotNull(individuals, individualId, individual);
 		
 		return true;
 	}
@@ -734,7 +736,7 @@ public class GedcomCreatorStructureStorage {
 		
 		if (view.size() > 1) {
 			throw new GedcomCreatorError("The parents " + parent1Id + " and " + parent2Id + 
-					" have been found as parent in more than one family: " + view);
+					" have been found as parent in more than one (" + view.size() + ") family: " + view);
 		}
 		
 		//Returns the first family, or null if there is none
@@ -869,7 +871,7 @@ public class GedcomCreatorStructureStorage {
 			List<String> spouseFamilyLinks = indi.getSpouseFamilyLinks();
 			for (String spouseFamilyLink : spouseFamilyLinks) {
 				if (!families.containsKey(spouseFamilyLink)) {
-					missingFamilies.add(spouseFamilyLink);
+					addIfNotNull(missingFamilies, spouseFamilyLink);
 					if (throwExceptionOnMissingStructures) {
 						throw new GedcomCreatorError("A spouse link to the family " + spouseFamilyLink + 
 								" is listed in the individual " + indi.getId() + 
@@ -882,7 +884,7 @@ public class GedcomCreatorStructureStorage {
 			List<String> childFamilyLinks = indi.getChildFamilyLinks();
 			for (String childFamilyLink : childFamilyLinks) {
 				if (!families.containsKey(childFamilyLink)) {
-					missingFamilies.add(childFamilyLink);
+					addIfNotNull(missingFamilies, childFamilyLink);
 					if (throwExceptionOnMissingStructures) {
 						throw new GedcomCreatorError("A child link to the family " + childFamilyLink + 
 								" is listed in the individual " + indi.getId() + 
@@ -900,15 +902,15 @@ public class GedcomCreatorStructureStorage {
 			String wifeLink = fam.getWifeLink();
 			
 			//--- familiesOfParent
-			familiesOfParent.put(husbLink, fam);
-			familiesOfParent.put(wifeLink, fam);
+			putIfNotNull(familiesOfParent, husbLink, fam);
+			putIfNotNull(familiesOfParent, wifeLink, fam);
 			
 			//--- partnersOfIndividual
 			//--- missingIndividuals
 			if (individuals.containsKey(husbLink)) {
-				partnersOfIndividual.put(husbLink, individuals.get(wifeLink));
+				putIfNotNull(partnersOfIndividual, husbLink, individuals.get(wifeLink));
 			} else {
-				missingIndividuals.add(husbLink);
+				addIfNotNull(missingIndividuals, husbLink);
 				if (throwExceptionOnMissingStructures) {
 					throw new GedcomCreatorError("A husband link to the individual " + husbLink + 
 							" is listed in the family " + fam.getId() + 
@@ -917,9 +919,9 @@ public class GedcomCreatorStructureStorage {
 			}
 			
 			if (individuals.containsKey(wifeLink)) {
-				partnersOfIndividual.put(wifeLink, individuals.get(husbLink));
+				putIfNotNull(partnersOfIndividual, wifeLink, individuals.get(husbLink));
 			} else {
-				missingIndividuals.add(husbLink);
+				addIfNotNull(missingIndividuals, husbLink);
 				if (throwExceptionOnMissingStructures) {
 					throw new GedcomCreatorError("A wife link to the individual " + wifeLink + 
 							" is listed in the family " + fam.getId() + 
@@ -931,13 +933,13 @@ public class GedcomCreatorStructureStorage {
 			//--- missingIndividuals
 			List<String> childLinks = fam.getChildLinks();
 			for (String childLink : childLinks) {
-				familiesOfChild.put(childLink, fam);
+				putIfNotNull(familiesOfChild, childLink, fam);
 				
 				if (individuals.containsKey(childLink)) {
-					childrenOfIndividual.put(husbLink, individuals.get(childLink));
-					childrenOfIndividual.put(wifeLink, individuals.get(childLink));
+					putIfNotNull(childrenOfIndividual, husbLink, individuals.get(childLink));
+					putIfNotNull(childrenOfIndividual, wifeLink, individuals.get(childLink));
 				} else {
-					missingIndividuals.add(childLink);
+					addIfNotNull(missingIndividuals, childLink);
 					if (throwExceptionOnMissingStructures) {
 						throw new GedcomCreatorError("A child link to the individual " + childLink + 
 								" is listed in the family " + fam.getId() + 
@@ -980,6 +982,74 @@ public class GedcomCreatorStructureStorage {
 		
 		System.out.println("Cleanup: " + toRemove.size() + " unnecessary families removed.");
 		
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 */
+	private static void putIfNotNull(Multimap<String, GedcomFamily> map, 
+			String key, GedcomFamily value) {
+		if (key != null) {
+			map.put(key,  value);
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 */
+	private static void putIfNotNull(Multimap<String, GedcomIndividual> map, 
+			String key, GedcomIndividual value) {
+		if (key != null) {
+			map.put(key,  value);
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 */
+	private static void putIfNotNull(Map<String, GedcomIndividual> map, 
+			String key, GedcomIndividual value) {
+		if (key != null) {
+			map.put(key,  value);
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 */
+	private static void putIfNotNull(Map<String, GedcomFamily> map, 
+			String key, GedcomFamily value) {
+		if (key != null) {
+			map.put(key,  value);
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param list
+	 * @param value
+	 */
+	private static void addIfNotNull(List<String> list, String value) {
+		if (value != null) {
+			list.add(value);
+		}
 	}
 
 }
