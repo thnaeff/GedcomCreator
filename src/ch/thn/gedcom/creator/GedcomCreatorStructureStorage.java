@@ -18,6 +18,7 @@ package ch.thn.gedcom.creator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,13 +52,19 @@ public class GedcomCreatorStructureStorage {
 	private HashMap<String, GedcomFamily> families = null;
 	private HashMap<String, GedcomIndividual> individuals = null;
 	
+	/** All the parents and their families. Is updated each time a family is added and through {@link #buildFamilyRelations()} */
 	private HashMultimap<String, GedcomFamily> familiesOfParent = null;
+	/** All the children and the families where they are part of. Only available after a call to {@link #buildFamilyRelations()} */
 	private HashMultimap<String, GedcomFamily> familiesOfChild = null;
 	
+	/** All the partners of an individual. Only available after a call to {@link #buildFamilyRelations()} */
 	private HashMultimap<String, GedcomIndividual> partnersOfIndividual = null;
+	/** All the children of an individual. Only available after a call to {@link #buildFamilyRelations()} */
 	private HashMultimap<String, GedcomIndividual> childrenOfIndividual = null;
 	
+	/** Any individuals which are linked but do not exist. Only available after a call to {@link #buildFamilyRelations()} */
 	private ArrayList<String> missingIndividuals = null;
+	/** Any families which are linked but do not exist. Only available after a call to {@link #buildFamilyRelations()} */
 	private ArrayList<String> missingFamilies = null;
 	
 	private boolean structuresModified = false;
@@ -262,19 +269,42 @@ public class GedcomCreatorStructureStorage {
 	 * ID is not already available, the more convenient {@link #addFamily(GedcomFamily)} 
 	 * method can be used.
 	 * @param family
+	 * @return <code>false</code> if a family with the given ID already exists or 
+	 * if there is already a family with the same husband and wife.
 	 */
-	public void addFamily(String familyId, GedcomFamily family) {
+	public boolean addFamily(String familyId, GedcomFamily family) {
+		if (families.containsKey(familyId)) {
+			return false;
+		}
+		
+		String husbLink = family.getHusbandLink();
+		String wifeLink = family.getWifeLink();
+		
+		if (familiesOfParent.containsKey(husbLink) && familiesOfParent.containsKey(wifeLink)) {
+			if (familiesOfParent.get(husbLink).equals(familiesOfParent.get(wifeLink))) {
+				//Both parents are already added through the same family
+				return false;
+			}
+		}
+		
+		familiesOfParent.put(husbLink, family);
+		familiesOfParent.put(wifeLink, family);
+		
 		structuresModified = true;
 		families.put(familyId, family);
+		
+		return true;
 	}
 	
 	/**
 	 * 
 	 * 
 	 * @param family
+	 * @return <code>false</code> if a family with the given ID already exists or 
+	 * if there is already a family with the same husband and wife.
 	 */
-	public void addFamily(GedcomFamily family) {
-		addFamily(family.getId(), family);
+	public boolean addFamily(GedcomFamily family) {
+		return addFamily(family.getId(), family);
 	}
 	
 	/**
@@ -287,19 +317,27 @@ public class GedcomCreatorStructureStorage {
 	 * ID is not already available, the more convenient {@link #addIndividual(GedcomIndividual)} 
 	 * method can be used.
 	 * @param individual
+	 * @return <code>false</code> if an individual with the given ID already exists.
 	 */
-	public void addIndividual(String individualId, GedcomIndividual individual) {
+	public boolean addIndividual(String individualId, GedcomIndividual individual) {
+		if (individuals.containsKey(individualId)) {
+			return false;
+		}
+		
 		structuresModified = true;
 		individuals.put(individualId, individual);
+		
+		return true;
 	}
 	
 	/**
 	 * 
 	 * 
 	 * @param individual
+	 * @return <code>false</code> if an individual with the same ID already exists.
 	 */
-	public void addIndividual(GedcomIndividual individual) {
-		addIndividual(individual.getId(), individual);
+	public boolean addIndividual(GedcomIndividual individual) {
+		return addIndividual(individual.getId(), individual);
 	}
 	
 	/**
@@ -544,15 +582,30 @@ public class GedcomCreatorStructureStorage {
 	
 	/**
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
 	 * 
 	 * @param individualId
 	 */
 	public Set<GedcomFamily> getFamiliesOfParent(String individualId) {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		return familiesOfParent.get(individualId);
 	}
 	
 	/**
 	 * 
+	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
 	 * 
 	 * @param individual
 	 * @return
@@ -564,14 +617,30 @@ public class GedcomCreatorStructureStorage {
 	/**
 	 * 
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
+	 * 
 	 * @param individualId
 	 */
 	public Set<GedcomIndividual> getChildrenOfIndividual(String individualId) {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		return childrenOfIndividual.get(individualId);
 	}
 	
 	/**
 	 * 
+	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
 	 * 
 	 * @param individual
 	 * @return
@@ -583,38 +652,78 @@ public class GedcomCreatorStructureStorage {
 	/**
 	 * 
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
+	 * 
 	 * @return
 	 */
 	public List<String> getMissingFamilies() {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		return missingFamilies;
 	}
 	
 	/**
 	 * 
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
+	 * 
 	 * @return
 	 */
 	public List<String> getMissingIndividuals() {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		return missingIndividuals;
 	}
 	
 	/**
 	 * 
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
+	 * 
 	 * @return
 	 */
 	public boolean hasMissingStructures() {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		return missingIndividuals.size() > 0 || missingFamilies.size() > 0;
 	}
 	
 	/**
 	 * 
 	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
+	 * 
 	 * @param parent1Id
 	 * @param parent2Id
 	 * @return
 	 */
 	public GedcomFamily getFamilyOfParents(String parent1Id, String parent2Id) {
+		if (structuresModified) {
+			buildFamilyRelations();
+		}
+		
 		Set<GedcomFamily> families1 = getFamiliesOfParent(parent1Id);
 		Set<GedcomFamily> families2 = getFamiliesOfParent(parent2Id);
 		
@@ -625,7 +734,7 @@ public class GedcomCreatorStructureStorage {
 		
 		if (view.size() > 1) {
 			throw new GedcomCreatorError("The parents " + parent1Id + " and " + parent2Id + 
-					" have been found as parent in more than one family.");
+					" have been found as parent in more than one family: " + view);
 		}
 		
 		//Returns the first family, or null if there is none
@@ -634,6 +743,12 @@ public class GedcomCreatorStructureStorage {
 	
 	/**
 	 * 
+	 * 
+	 * <b>Note:</b> Depends on the collection of information through {@link #buildFamilyRelations()}. 
+	 * Calls {@link #buildFamilyRelations()} before returning the 
+	 * result if any structures have been added or removed after the last call 
+	 * to {@link #buildFamilyRelations()}, thus calling this method repeatedly 
+	 * after adding/removing structures is very inefficient.
 	 * 
 	 * @param parent1
 	 * @param parent2
@@ -742,7 +857,7 @@ public class GedcomCreatorStructureStorage {
 	}
 	
 	/**
-	 * 
+	 * Collects information about the relations between individuals/families.
 	 * 
 	 */
 	public void buildFamilyRelations() {
@@ -750,6 +865,7 @@ public class GedcomCreatorStructureStorage {
 		
 		for (GedcomIndividual indi : individuals.values()) {
 			
+			//--- missingFamilies
 			List<String> spouseFamilyLinks = indi.getSpouseFamilyLinks();
 			for (String spouseFamilyLink : spouseFamilyLinks) {
 				if (!families.containsKey(spouseFamilyLink)) {
@@ -762,6 +878,7 @@ public class GedcomCreatorStructureStorage {
 				}
 			}
 			
+			//--- missingFamilies
 			List<String> childFamilyLinks = indi.getChildFamilyLinks();
 			for (String childFamilyLink : childFamilyLinks) {
 				if (!families.containsKey(childFamilyLink)) {
@@ -782,11 +899,14 @@ public class GedcomCreatorStructureStorage {
 			String husbLink = fam.getHusbandLink();
 			String wifeLink = fam.getWifeLink();
 			
+			//--- familiesOfParent
 			familiesOfParent.put(husbLink, fam);
 			familiesOfParent.put(wifeLink, fam);
 			
+			//--- partnersOfIndividual
+			//--- missingIndividuals
 			if (individuals.containsKey(husbLink)) {
-				partnersOfIndividual.put(husbLink, individuals.get(husbLink));
+				partnersOfIndividual.put(husbLink, individuals.get(wifeLink));
 			} else {
 				missingIndividuals.add(husbLink);
 				if (throwExceptionOnMissingStructures) {
@@ -797,7 +917,7 @@ public class GedcomCreatorStructureStorage {
 			}
 			
 			if (individuals.containsKey(wifeLink)) {
-				partnersOfIndividual.put(wifeLink, individuals.get(wifeLink));
+				partnersOfIndividual.put(wifeLink, individuals.get(husbLink));
 			} else {
 				missingIndividuals.add(husbLink);
 				if (throwExceptionOnMissingStructures) {
@@ -807,6 +927,8 @@ public class GedcomCreatorStructureStorage {
 				}
 			}
 			
+			//--- familiesOfChild
+			//--- missingIndividuals
 			List<String> childLinks = fam.getChildLinks();
 			for (String childLink : childLinks) {
 				familiesOfChild.put(childLink, fam);
@@ -828,6 +950,35 @@ public class GedcomCreatorStructureStorage {
 		}
 		
 		structuresModified = false;
+		
+	}
+	
+	/**
+	 * 
+	 * 
+	 */
+	public void cleanup() {
+		
+		Set<GedcomFamily> toRemove = new HashSet<>();
+		
+		for (GedcomFamily family : families.values()) {
+			boolean noHusbandLink = (family.getHusbandLink() == null || family.getHusbandLink().length() == 0);
+			boolean noWifeLink = (family.getWifeLink() == null || family.getWifeLink().length() == 0);
+			boolean noChildLinks = family.getNumberOfChildren() == 0;
+			
+			if (noHusbandLink && noWifeLink) {
+				//Family without parents
+				toRemove.add(family);
+			} else if (noChildLinks && (noWifeLink || noHusbandLink)) {
+				//Family with a single parent and no children
+				toRemove.add(family);
+			}
+			
+		}
+		
+		families.values().removeAll(toRemove);
+		
+		System.out.println("Cleanup: " + toRemove.size() + " unnecessary families removed.");
 		
 	}
 
