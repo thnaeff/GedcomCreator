@@ -320,7 +320,7 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	
 	@Override
 	public String toString() {
-		return getId() + ": " + getHusbandLink() + ", " + getWifeLink();
+		return getId() + ": HUSB=" + getHusbandLink() + "/WIFE=" + getWifeLink();
 	}
 
 }
