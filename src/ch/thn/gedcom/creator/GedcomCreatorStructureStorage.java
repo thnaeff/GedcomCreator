@@ -283,8 +283,8 @@ public class GedcomCreatorStructureStorage {
 		String wifeLink = family.getWifeLink();
 		
 		if (familiesOfParent.containsKey(husbLink) && familiesOfParent.containsKey(wifeLink)) {
-			if (familiesOfParent.get(husbLink).equals(familiesOfParent.get(wifeLink))) {
-				//Both parents are already added through the same family
+			if (getFamilyOfParents(husbLink, wifeLink) != null) {
+				//Both parents have a family already
 				return false;
 			}
 		}
