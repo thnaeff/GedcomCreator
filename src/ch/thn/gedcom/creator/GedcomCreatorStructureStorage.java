@@ -99,8 +99,8 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @param structureStorage
 	 */
-	public void combine(GedcomCreatorStructureStorage structureStorage) {
-		combine(structureStorage, true, true, true, true, true);
+	public void addAll(GedcomCreatorStructureStorage structureStorage) {
+		add(structureStorage, true, true, true, true, true);
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public class GedcomCreatorStructureStorage {
 	 * @param family
 	 * @param individual
 	 */
-	public void combine(GedcomCreatorStructureStorage structureStorage, 
+	public void add(GedcomCreatorStructureStorage structureStorage, 
 			boolean eof, boolean header, boolean submitter, boolean family, boolean individual) {
 		if (eof) {
 			eofs.putAll(structureStorage.getEOFs());
