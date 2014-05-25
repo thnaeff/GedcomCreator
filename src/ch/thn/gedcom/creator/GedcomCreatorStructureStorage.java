@@ -964,10 +964,13 @@ public class GedcomCreatorStructureStorage {
 		Set<GedcomFamily> toRemove = new HashSet<>();
 		
 		for (GedcomFamily family : families.values()) {
-			boolean noHusbandLink = (family.getHusbandLink() == null || family.getHusbandLink().length() == 0);
-			boolean noWifeLink = (family.getWifeLink() == null || family.getWifeLink().length() == 0);
-			boolean noChildLinks = family.getNumberOfChildren() == 0;
+			String husbLink = family.getHusbandLink();
+			String wifeLink = family.getWifeLink();
 			
+			boolean noHusbandLink = (husbLink == null || husbLink.length() == 0);
+			boolean noWifeLink = (wifeLink == null || wifeLink.length() == 0);
+			boolean noChildLinks = (family.getNumberOfChildren() == 0);
+						
 			if (noHusbandLink && noWifeLink) {
 				//Family without parents
 				toRemove.add(family);
@@ -980,7 +983,7 @@ public class GedcomCreatorStructureStorage {
 		
 		families.values().removeAll(toRemove);
 		
-		System.out.println("Cleanup: " + toRemove.size() + " unnecessary families removed.");
+		System.out.println("Cleanup: " + toRemove.size() + " families removed.");
 		
 	}
 	
