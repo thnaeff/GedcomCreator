@@ -17,11 +17,12 @@
 package ch.thn.gedcom.creator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import ch.thn.gedcom.creator.structures.GedcomEOF;
 import ch.thn.gedcom.creator.structures.GedcomFamily;
@@ -40,7 +41,11 @@ import com.google.common.collect.Sets.SetView;
  * This class can be used to collect all the gedcom creator structures and it provides 
  * the functionality to create family connections between all individuals and families 
  * (for example all children of an individual, all partners of an individual, ...). 
- * It also collects any missing individuals and families.
+ * It also collects any missing individuals and families.<br />
+ * <br />
+ * <br />
+ * It uses a {@link TreeMap} for the storage of the structure keys and structures, 
+ * which sorts the structures by the natural ordering of the keys (structure ID's).
  * 
  *
  * @author Thomas Naeff (github.com/thnaeff)
@@ -48,11 +53,11 @@ import com.google.common.collect.Sets.SetView;
  */
 public class GedcomCreatorStructureStorage {
 	
-	private HashMap<String, GedcomEOF> eofs = null;
-	private HashMap<String, GedcomHeader> headers = null;
-	private HashMap<String, GedcomSubmitter> submitters = null;
-	private HashMap<String, GedcomFamily> families = null;
-	private HashMap<String, GedcomIndividual> individuals = null;
+	private TreeMap<String, GedcomEOF> eofs = null;
+	private TreeMap<String, GedcomHeader> headers = null;
+	private TreeMap<String, GedcomSubmitter> submitters = null;
+	private TreeMap<String, GedcomFamily> families = null;
+	private TreeMap<String, GedcomIndividual> individuals = null;
 	
 	/** All the parents and their families. Is updated each time a family is added and through {@link #buildFamilyRelations()} */
 	private HashMultimap<String, GedcomFamily> familiesOfParent = null;
@@ -77,11 +82,11 @@ public class GedcomCreatorStructureStorage {
 	 */
 	public GedcomCreatorStructureStorage() {
 		
-		eofs = new HashMap<>();
-		headers = new HashMap<>();
-		submitters = new HashMap<>();
-		families = new HashMap<>();
-		individuals = new HashMap<>();
+		eofs = new TreeMap<>();
+		headers = new TreeMap<>();
+		submitters = new TreeMap<>();
+		families = new TreeMap<>();
+		individuals = new TreeMap<>();
 		
 		familiesOfParent = HashMultimap.create();
 		familiesOfChild = HashMultimap.create();
@@ -118,23 +123,23 @@ public class GedcomCreatorStructureStorage {
 	public void add(GedcomCreatorStructureStorage structureStorage, 
 			boolean eof, boolean header, boolean submitter, boolean family, boolean individual) {
 		if (eof) {
-			eofs.putAll(structureStorage.getEOFs());
+			eofs.putAll(structureStorage.getModifiableEOFs());
 		}
 		
 		if (header) {
-			headers.putAll(structureStorage.getHeaders());
+			headers.putAll(structureStorage.getModifiableHeaders());
 		}
 		
 		if (submitter) {
-			submitters.putAll(structureStorage.getSubmitters());
+			submitters.putAll(structureStorage.getModifiableSubmitters());
 		}
 		
 		if (family) {
-			families.putAll(structureStorage.getFamilies());
+			families.putAll(structureStorage.getModifiableFamilies());
 		}
 		
 		if (individual) {
-			individuals.putAll(structureStorage.getIndividualss());
+			individuals.putAll(structureStorage.getModifiableIndividuals());
 		}
 	}
 	
@@ -143,7 +148,7 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @return
 	 */
-	protected HashMap<String, GedcomEOF> getEOFs() {
+	protected TreeMap<String, GedcomEOF> getModifiableEOFs() {
 		return eofs;
 	}
 	
@@ -152,7 +157,7 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @return
 	 */
-	protected HashMap<String, GedcomHeader> getHeaders() {
+	protected TreeMap<String, GedcomHeader> getModifiableHeaders() {
 		return headers;
 	}
 	
@@ -161,7 +166,7 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @return
 	 */
-	protected HashMap<String, GedcomSubmitter> getSubmitters() {
+	protected TreeMap<String, GedcomSubmitter> getModifiableSubmitters() {
 		return submitters;
 	}
 	
@@ -170,7 +175,7 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @return
 	 */
-	protected HashMap<String, GedcomFamily> getFamilies() {
+	protected TreeMap<String, GedcomFamily> getModifiableFamilies() {
 		return families;
 	}
 	
@@ -179,7 +184,7 @@ public class GedcomCreatorStructureStorage {
 	 * 
 	 * @return
 	 */
-	protected HashMap<String, GedcomIndividual> getIndividualss() {
+	protected TreeMap<String, GedcomIndividual> getModifiableIndividuals() {
 		return individuals;
 	}
 	
@@ -275,7 +280,7 @@ public class GedcomCreatorStructureStorage {
 	 * if there is already a family with the same husband and wife.
 	 */
 	public boolean addFamily(String familyId, GedcomFamily family) {
-		if (families.containsKey(familyId)) {
+		if (familyId != null && families.containsKey(familyId)) {
 			return false;
 		}
 		
@@ -322,7 +327,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return <code>false</code> if an individual with the given ID already exists.
 	 */
 	public boolean addIndividual(String individualId, GedcomIndividual individual) {
-		if (individuals.containsKey(individualId)) {
+		if (individualId != null && individuals.containsKey(individualId)) {
 			return false;
 		}
 		
@@ -349,6 +354,10 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomEOF getEOF(String eofId) {
+		if (eofId == null) {
+			return null;
+		}
+		
 		return eofs.get(eofId);
 	}
 	
@@ -359,6 +368,10 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomHeader getHeader(String headerId) {
+		if (headerId == null) {
+			return null;
+		}
+		
 		return headers.get(headerId);
 	}
 	
@@ -369,6 +382,10 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomSubmitter getSubmitter(String submitterId) {
+		if (submitterId == null) {
+			return null;
+		}
+		
 		return submitters.get(submitterId);
 	}
 	
@@ -379,6 +396,10 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomFamily getFamily(String familyId) {
+		if (familyId == null) {
+			return null;
+		}
+		
 		return families.get(familyId);
 	}
 	
@@ -389,6 +410,10 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public GedcomIndividual getIndividual(String individualId) {
+		if (individualId == null) {
+			return null;
+		}
+		
 		return individuals.get(individualId);
 	}
 	
@@ -448,7 +473,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public boolean hasEOF(String eofId) {
-		return eofs.containsKey(eofId);
+		return eofId != null && eofs.containsKey(eofId);
 	}
 	
 	/**
@@ -458,7 +483,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public boolean hasHeader(String headerId) {
-		return headers.containsKey(headerId);
+		return headerId != null && headers.containsKey(headerId);
 	}
 	
 	/**
@@ -468,7 +493,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public boolean hasSubmitter(String submitterId) {
-		return submitters.containsKey(submitterId);
+		return submitterId != null && submitters.containsKey(submitterId);
 	}
 	
 	/**
@@ -478,7 +503,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public boolean hasFamily(String familyId) {
-		return families.containsKey(familyId);
+		return familyId != null && families.containsKey(familyId);
 	}
 	
 	/**
@@ -488,7 +513,7 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	public boolean hasIndividual(String individualId) {
-		return individuals.containsKey(individualId);
+		return individualId != null && individuals.containsKey(individualId);
 	}
 	
 	/**
@@ -581,6 +606,52 @@ public class GedcomCreatorStructureStorage {
 	public GedcomIndividual removeIndividual(GedcomIndividual individual) {
 		return removeIndividual(individual.getId());
 	}
+	
+	/**
+	 * Returns an unmodifiable view on the EOF map
+	 * 
+	 * @return
+	 */
+	public Map<String, GedcomEOF> getEOFs() {
+		return Collections.unmodifiableMap(eofs);
+	}
+	
+	/**
+	 * Returns an unmodifiable view on the HEADER map
+	 * 
+	 * @return
+	 */
+	public Map<String, GedcomHeader> getHeaders() {
+		return Collections.unmodifiableMap(headers);
+	}
+	
+	/**
+	 * Returns an unmodifiable view on the SUBMITTER map
+	 * 
+	 * @return
+	 */
+	public Map<String, GedcomSubmitter> getSubmitters() {
+		return Collections.unmodifiableMap(submitters);
+	}
+	
+	/**
+	 * Returns an unmodifiable view on the FAMILY map
+	 * 
+	 * @return
+	 */
+	public Map<String, GedcomFamily> getFamilies() {
+		return Collections.unmodifiableMap(families);
+	}
+	
+	/**
+	 * Returns an unmodifiable view on the INDIVIDUAL map
+	 * 
+	 * @return
+	 */
+	public Map<String, GedcomIndividual> getIndividuals() {
+		return Collections.unmodifiableMap(individuals);
+	}
+	
 	
 	/**
 	 * 
@@ -870,8 +941,8 @@ public class GedcomCreatorStructureStorage {
 			//--- missingFamilies
 			List<String> spouseFamilyLinks = indi.getSpouseFamilyLinks();
 			for (String spouseFamilyLink : spouseFamilyLinks) {
-				if (!families.containsKey(spouseFamilyLink)) {
-					addIfNotNull(missingFamilies, spouseFamilyLink);
+				if (spouseFamilyLink != null && !families.containsKey(spouseFamilyLink)) {
+					missingFamilies.add(spouseFamilyLink);
 					if (throwExceptionOnMissingStructures) {
 						throw new GedcomCreatorError("A spouse link to the family " + spouseFamilyLink + 
 								" is listed in the individual " + indi.getId() + 
@@ -883,8 +954,8 @@ public class GedcomCreatorStructureStorage {
 			//--- missingFamilies
 			List<String> childFamilyLinks = indi.getChildFamilyLinks();
 			for (String childFamilyLink : childFamilyLinks) {
-				if (!families.containsKey(childFamilyLink)) {
-					addIfNotNull(missingFamilies, childFamilyLink);
+				if (childFamilyLink != null && !families.containsKey(childFamilyLink)) {
+					missingFamilies.add(childFamilyLink);
 					if (throwExceptionOnMissingStructures) {
 						throw new GedcomCreatorError("A child link to the family " + childFamilyLink + 
 								" is listed in the individual " + indi.getId() + 
@@ -907,8 +978,8 @@ public class GedcomCreatorStructureStorage {
 			
 			//--- partnersOfIndividual
 			//--- missingIndividuals
-			if (individuals.containsKey(husbLink)) {
-				putIfNotNull(partnersOfIndividual, husbLink, individuals.get(wifeLink));
+			if (husbLink != null && wifeLink != null && individuals.containsKey(husbLink)) {
+				partnersOfIndividual.put(husbLink, individuals.get(wifeLink));
 			} else {
 				addIfNotNull(missingIndividuals, husbLink);
 				if (throwExceptionOnMissingStructures) {
@@ -918,8 +989,8 @@ public class GedcomCreatorStructureStorage {
 				}
 			}
 			
-			if (individuals.containsKey(wifeLink)) {
-				putIfNotNull(partnersOfIndividual, wifeLink, individuals.get(husbLink));
+			if (wifeLink != null && husbLink != null && individuals.containsKey(wifeLink)) {
+				partnersOfIndividual.put(wifeLink, individuals.get(husbLink));
 			} else {
 				addIfNotNull(missingIndividuals, husbLink);
 				if (throwExceptionOnMissingStructures) {
@@ -935,7 +1006,7 @@ public class GedcomCreatorStructureStorage {
 			for (String childLink : childLinks) {
 				putIfNotNull(familiesOfChild, childLink, fam);
 				
-				if (individuals.containsKey(childLink)) {
+				if (childLink != null && individuals.containsKey(childLink)) {
 					putIfNotNull(childrenOfIndividual, husbLink, individuals.get(childLink));
 					putIfNotNull(childrenOfIndividual, wifeLink, individuals.get(childLink));
 				} else {
