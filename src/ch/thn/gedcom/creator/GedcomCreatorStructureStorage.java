@@ -239,9 +239,10 @@ public class GedcomCreatorStructureStorage {
 	 * @param eofId
 	 * @param eof
 	 */
-	public void addEOF(String eofId, GedcomEOF eof) {
+	public boolean addEOF(String eofId, GedcomEOF eof) {
 		structuresModified = true;
-		eofs.put(eofId, eof);
+		putIfNotNull(eofs, eofId, eof);
+		return true;
 	}
 	
 	/**
@@ -250,9 +251,10 @@ public class GedcomCreatorStructureStorage {
 	 * @param headerId
 	 * @param header
 	 */
-	public void addHeader(String headerId, GedcomHeader header) {
+	public boolean addHeader(String headerId, GedcomHeader header) {
 		structuresModified = true;
-		headers.put(headerId, header);
+		putIfNotNull(headers, headerId, header);
+		return true;
 	}
 	
 	/**
@@ -261,9 +263,10 @@ public class GedcomCreatorStructureStorage {
 	 * @param submitterId
 	 * @param submitter
 	 */
-	public void addSubmitter(String submitterId, GedcomSubmitter submitter) {
+	public boolean addSubmitter(String submitterId, GedcomSubmitter submitter) {
 		structuresModified = true;
-		submitters.put(submitterId, submitter);
+		putIfNotNull(submitters, submitterId, submitter);
+		return true;
 	}
 	
 	/**
@@ -1079,12 +1082,16 @@ public class GedcomCreatorStructureStorage {
 	 * @param map
 	 * @param key
 	 * @param value
+	 * @return
 	 */
-	private static void putIfNotNull(Multimap<String, GedcomFamily> map, 
+	private static boolean putIfNotNull(Multimap<String, GedcomFamily> map, 
 			String key, GedcomFamily value) {
 		if (key != null) {
 			map.put(key,  value);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**
@@ -1093,12 +1100,16 @@ public class GedcomCreatorStructureStorage {
 	 * @param map
 	 * @param key
 	 * @param value
+	 * @return
 	 */
-	private static void putIfNotNull(Multimap<String, GedcomIndividual> map, 
+	private static boolean putIfNotNull(Multimap<String, GedcomIndividual> map, 
 			String key, GedcomIndividual value) {
 		if (key != null) {
 			map.put(key,  value);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**
@@ -1107,12 +1118,70 @@ public class GedcomCreatorStructureStorage {
 	 * @param map
 	 * @param key
 	 * @param value
+	 * @return
 	 */
-	private static void putIfNotNull(Map<String, GedcomIndividual> map, 
+	private static boolean putIfNotNull(Map<String, GedcomEOF> map, 
+			String key, GedcomEOF value) {
+		if (key != null) {
+			map.put(key,  value);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	private static boolean putIfNotNull(Map<String, GedcomSubmitter> map, 
+			String key, GedcomSubmitter value) {
+		if (key != null) {
+			map.put(key,  value);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	private static boolean putIfNotNull(Map<String, GedcomHeader> map, 
+			String key, GedcomHeader value) {
+		if (key != null) {
+			map.put(key,  value);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param map
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	private static boolean putIfNotNull(Map<String, GedcomIndividual> map, 
 			String key, GedcomIndividual value) {
 		if (key != null) {
 			map.put(key,  value);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**
@@ -1121,24 +1190,31 @@ public class GedcomCreatorStructureStorage {
 	 * @param map
 	 * @param key
 	 * @param value
+	 * @return
 	 */
-	private static void putIfNotNull(Map<String, GedcomFamily> map, 
+	private static boolean putIfNotNull(Map<String, GedcomFamily> map, 
 			String key, GedcomFamily value) {
 		if (key != null) {
 			map.put(key,  value);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**
-	 * 
 	 * 
 	 * @param list
 	 * @param value
+	 * @return
 	 */
-	private static void addIfNotNull(List<String> list, String value) {
+	private static boolean addIfNotNull(List<String> list, String value) {
 		if (value != null) {
 			list.add(value);
+			return true;
 		}
+		
+		return false;
 	}
 
 }
