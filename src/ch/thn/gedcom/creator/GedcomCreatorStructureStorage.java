@@ -259,14 +259,33 @@ public class GedcomCreatorStructureStorage {
 	
 	/**
 	 * 
-	 * 
-	 * @param submitterId
+	 * @param submitterId Even though the submitter ID is already in the {@link GedcomSubmitter} 
+	 * object and could be easily retrieved with {@link GedcomSubmitter#getId()}, the ID 
+	 * can be given here if it is already available since that would save the getId-call 
+	 * which might require some path following on the internal {@link GedcomNode}. If the 
+	 * ID is not already available, the more convenient {@link #addSubmitter(GedcomSubmitter)} 
+	 * method can be used.
 	 * @param submitter
+	 * @return <code>false</code> if a submitter with the given ID already exists.
 	 */
 	public boolean addSubmitter(String submitterId, GedcomSubmitter submitter) {
+		if (submitterId != null && submitters.containsKey(submitterId)) {
+			return false;
+		}
+		
 		structuresModified = true;
 		putIfNotNull(submitters, submitterId, submitter);
 		return true;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param submitter
+	 * @return <code>false</code> if a submitter with the given ID already exists.
+	 */
+	public boolean addSubmitter(GedcomSubmitter submitter) {
+		return addSubmitter(submitter.getId(), submitter);
 	}
 	
 	/**
