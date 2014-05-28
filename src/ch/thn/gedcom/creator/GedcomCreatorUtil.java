@@ -102,7 +102,7 @@ public class GedcomCreatorUtil {
 			structureStorage.addSubmitter(structureId, (GedcomSubmitter)structure);
 			break;
 		default:
-			break;
+			throw new GedcomCreatorError("Unknown structure type " + structureName);
 		}
 		
 	}
