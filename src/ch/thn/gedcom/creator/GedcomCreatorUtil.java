@@ -32,6 +32,8 @@ import ch.thn.gedcom.store.GedcomStore;
  */
 public class GedcomCreatorUtil {
 	
+	private static int IDCount = 0;
+	
 	/**
 	 * Creates the gedcom structure according to the type of the given gedcom head node
 	 * 
@@ -79,7 +81,11 @@ public class GedcomCreatorUtil {
 		
 		switch (structureName) {
 		case AbstractGedcomStructure.END_OF_FILE:
-			structureStorage.addEOF(structureId, (GedcomEOF)structure);
+			if (structureId != null) {
+				structureStorage.addEOF(structureId, (GedcomEOF)structure);
+			} else {
+				structureStorage.addEOF(String.valueOf(generateID()), (GedcomEOF)structure);
+			}
 			break;
 		case AbstractGedcomStructure.FAM_RECORD:
 			if (structureId != null) {
@@ -89,7 +95,11 @@ public class GedcomCreatorUtil {
 			}
 			break;
 		case AbstractGedcomStructure.HEADER:
-			structureStorage.addHeader(structureId, (GedcomHeader)structure);
+			if (structureId != null) {
+				structureStorage.addHeader(structureId, (GedcomHeader)structure);
+			} else {
+				structureStorage.addHeader(String.valueOf(generateID()), (GedcomHeader)structure);
+			}
 			break;
 		case AbstractGedcomStructure.INDIVIDUAL_RECORD:
 			if (structureId != null) {
@@ -99,12 +109,25 @@ public class GedcomCreatorUtil {
 			}
 			break;
 		case AbstractGedcomStructure.SUBMITTER_RECORD:
-			structureStorage.addSubmitter(structureId, (GedcomSubmitter)structure);
+			if (structureId != null) {
+				structureStorage.addSubmitter(structureId, (GedcomSubmitter)structure);
+			} else {
+				structureStorage.addSubmitter((GedcomSubmitter)structure);
+			}
 			break;
 		default:
 			throw new GedcomCreatorError("Unknown structure type " + structureName);
 		}
 		
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	private static int generateID() {
+		return IDCount++;
 	}
 
 }
