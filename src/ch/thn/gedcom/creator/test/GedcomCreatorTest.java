@@ -70,11 +70,11 @@ public class GedcomCreatorTest {
 				new String[] {"phone21", "phone22", "phone23"}, new String[] {"email21", "email22"}, 
 				new String[] {"fax2"}, new String[] {"www2"});
 		indi.addSpouseFamilyLink("spouse1");
-		indi.addSpouseFamilyLink("spouse2");
 		indi.addChildFamilyLink("child");
 		indi.addNote("A Note");
 		indi.addNote("Another Note");
 		indi.setChangeDate(GedcomFormatter.getGedcomDate(new Date(), true, true), GedcomFormatter.getGedcomTime(new Date()));
+		indi.addSpouseFamilyLink("spouse2");
 		
 //		indi.removeSex();
 //		indi.removePhone(1, 1);

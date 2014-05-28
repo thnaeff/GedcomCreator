@@ -24,6 +24,7 @@ import ch.thn.gedcom.creator.GedcomEnums.YesNo;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
+import ch.thn.util.StringUtil;
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
@@ -168,7 +169,7 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * 
+	 * Returns the link to a child
 	 * 
 	 * @param index
 	 * @return
@@ -178,7 +179,7 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * 
+	 * Returns all the links to the children
 	 * 
 	 * @return
 	 */
@@ -191,6 +192,21 @@ public class GedcomFamily extends AbstractGedcomStructure {
 		return result;
 	}
 	
+//	/**
+//	 * Returns the index of the child link among all child links.<br />
+//	 * <br />
+//	 * <b><i>Hint</i></b>: Only use this method if very few indexes are needed. 
+//	 * If many indexes are needed or if this method would be called repeatedly, 
+//	 * use {@link #getChildLinks()} to first collect a list of all the child links 
+//	 * and then use that list to determine the index (better performance).
+//	 * 
+//	 * @param childId
+//	 * @return
+//	 */
+//	public int indexOfChildLink(String childId) {
+//		return indexOfChildXRef(childId, "CHIL");
+//	}
+	
 	/**
 	 * 
 	 * 
@@ -199,6 +215,22 @@ public class GedcomFamily extends AbstractGedcomStructure {
 	 */
 	public boolean removeChildLink(int index) {
 		return remove("CHIL" + GedcomNode.PATH_OPTION_DELIMITER + index);
+	}
+	
+	/**
+	 * Searches for the child link which links to the given child and removes it
+	 * 
+	 * @param childId
+	 * @return
+	 */
+	public boolean removeChildLink(String childId) {
+		int count = getNumberOfChildren();
+		while (count > 0) {
+			if (StringUtil.equals(getChildLink(--count), childId)) {
+				return removeChildLink(count);
+			}
+		}
+		return false;
 	}
 	
 	/**

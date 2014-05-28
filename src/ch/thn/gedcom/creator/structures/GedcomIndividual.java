@@ -31,6 +31,7 @@ import ch.thn.gedcom.data.GedcomAccessError;
 import ch.thn.gedcom.data.GedcomNode;
 import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.store.GedcomStore;
+import ch.thn.util.StringUtil;
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
@@ -692,26 +693,6 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	}
 	
 	/**
-	 * Removes the ADDR part of the address structure
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public boolean removeAddress(int index) {
-		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
-	}
-	
-	/**
-	 * Removes the whole address structure
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public boolean removeAddressStructure(int index) {
-		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
-	}
-	
-	/**
 	 * 
 	 * 
 	 * @param index
@@ -733,6 +714,42 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 			result.add(getAddress(--count));
 		}
 		return result;
+	}
+	
+	/**
+	 * Removes the ADDR part of the address structure
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeAddress(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "ADDR");
+	}
+	
+	/**
+	 * Searches for the address with the given value and removes it
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public boolean removeAddress(String value) {
+		int count = getNumberOfAddresses();
+		while (count > 0) {
+			if (StringUtil.equals(getAddress(--count), value)) {
+				return removeAddress(count);
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Removes the whole address structure
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean removeAddressStructure(int index) {
+		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE");
 	}
 	
 	/**
@@ -884,6 +901,23 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	}
 	
 	/**
+	 * Searches for the phone with the given value and removes it
+	 * 
+	 * @param index
+	 * @param value
+	 * @return
+	 */
+	public boolean removePhone(int index, String value) {
+		int count = getNumberOfPhones(index);
+		while (count > 0) {
+			if (StringUtil.equals(getPhone(index, --count), value)) {
+				return removePhone(index, count);
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * 
 	 * 
 	 * @param index
@@ -941,6 +975,23 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	}
 	
 	/**
+	 * Searches for the E-Mail with the given value and removes it
+	 * 
+	 * @param index
+	 * @param value
+	 * @return
+	 */
+	public boolean removeEMail(int index, String value) {
+		int count = getNumberOfEMails(index);
+		while (count > 0) {
+			if (StringUtil.equals(getEMail(index, --count), value)) {
+				return removeEMail(index, count);
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * 
 	 * 
 	 * @param index
@@ -990,6 +1041,23 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	}
 	
 	/**
+	 * Searches for the phone with the given value and removes it
+	 * 
+	 * @param index
+	 * @param value
+	 * @return
+	 */
+	public boolean removeFax(int index, String value) {
+		int count = getNumberOfFax(index);
+		while (count > 0) {
+			if (StringUtil.equals(getFax(index, --count), value)) {
+				return removeFax(index, count);
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * 
 	 * 
 	 * @param index
@@ -1036,6 +1104,23 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 */
 	public boolean removeWebsite(int index, int wwwIndex) {
 		return remove("INDIVIDUAL_ATTRIBUTE_STRUCTURE;RESI" + GedcomNode.PATH_OPTION_DELIMITER + index, "RESI", (!isV55() ? "INDIVIDUAL_EVENT_DETAIL" : null), "EVENT_DETAIL", "ADDRESS_STRUCTURE", "WWW" + GedcomNode.PATH_OPTION_DELIMITER + wwwIndex);
+	}
+	
+	/**
+	 * Searches for the website with the given value and removes it
+	 * 
+	 * @param index
+	 * @param value
+	 * @return
+	 */
+	public boolean removeWebsite(int index, String value) {
+		int count = getNumberOfWebsites(index);
+		while (count > 0) {
+			if (StringUtil.equals(getWebsite(index, --count), value)) {
+				return removeWebsite(index, count);
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -1104,6 +1189,21 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 		return remove("SPOUSE_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMS");
 	}
 	
+	/**
+	 * Searches for the spouse link which links to the given family and removes it
+	 * 
+	 * @param familyId
+	 * @return
+	 */
+	public boolean removeSpouseFamilyLink(String familyId) {
+		int count = getNumberOfSpouseFamilyLinks();
+		while (count > 0) {
+			if (StringUtil.equals(getSpouseFamilyLink(--count), familyId)) {
+				return removeSpouseFamilyLink(count);
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * 
@@ -1169,6 +1269,22 @@ public class GedcomIndividual extends AbstractGedcomStructure {
 	 */
 	public boolean removeChildFamilyLink(int index) {
 		return remove("CHILD_TO_FAMILY_LINK" + GedcomNode.PATH_OPTION_DELIMITER + index, "FAMC");
+	}
+	
+	/**
+	 * Searches for the child link which links to the given family and removes it
+	 * 
+	 * @param familyId
+	 * @return
+	 */
+	public boolean removeChildFamilyLink(String familyId) {
+		int count = getNumberOfSpouseFamilyLinks();
+		while (count > 0) {
+			if (StringUtil.equals(getChildFamilyLink(--count), familyId)) {
+				return removeChildFamilyLink(count);
+			}
+		}
+		return false;
 	}
 	
 	/**

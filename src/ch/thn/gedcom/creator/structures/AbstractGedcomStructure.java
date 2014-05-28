@@ -17,12 +17,14 @@
 package ch.thn.gedcom.creator.structures;
 
 import java.util.Arrays;
-
 import ch.thn.gedcom.creator.GedcomCreatorError;
+import ch.thn.gedcom.data.GedcomLine;
 import ch.thn.gedcom.data.GedcomNode;
+import ch.thn.gedcom.data.GedcomTagLine;
 import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
 import ch.thn.gedcom.store.GedcomStore;
+import ch.thn.util.tree.core.TreeIterator;
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
@@ -280,7 +282,7 @@ public abstract class AbstractGedcomStructure {
 	/**
 	 * Removes the line at the end of the given path. If one 
 	 * path can not be removed, it returns <code>false</code> and no paths are 
-	 * removed. In addition, any unused and empty parent nodes are removed too.
+	 * removed.
 	 * 
 	 * @param node
 	 * @param path
@@ -294,6 +296,129 @@ public abstract class AbstractGedcomStructure {
 		}
 						
 		return true;
+	}
+	
+	/**
+	 * Returns the index of the given value among the child lines with the given 
+	 * tag. Only tag lines are considered.
+	 * 
+	 * @param value The value to look for
+	 * @param tag The lines to look for the values have to be of the tag line 
+	 * with this tag
+	 * @param path The path to look for the child value
+	 * @return The index if the value has been found, or <code>-1</code> if the 
+	 * value has not been found
+	 */
+	protected int indexOfChildValue(String value, String tag, String... path) {
+		return indexOfChildValue(baseNode, value, tag, 0, path);
+	}
+	
+	/**
+	 * Returns the index of the given value among the child lines with the given 
+	 * tag. Only tag lines are considered.
+	 * 
+	 * @param node The node to follow the path from
+	 * @param value The value to look for
+	 * @param tag The lines to look for the values have to be of the tag line 
+	 * with this tag
+	 * @param offset The offset of the line to look for the value. Since it uses 
+	 * a iterator for searching, setting an offset still starts at the head of the 
+	 * sub tree but skips all occurrences until the index is greater or equal the offset.
+	 * @param path The path to look for the child value
+	 * @return The index if the value has been found, or <code>-1</code> if the 
+	 * value has not been found
+	 */
+	protected int indexOfChildValue(GedcomNode node, String value, String tag, 
+			int offset, String... path) {
+		GedcomNode n = node.followPath(path);
+		
+		//Use the iterator for the sub-tree of the current node since values could 
+		//be nested under some structure lines. For example:
+		//├─ SPOUSE_TO_FAMILY_LINK
+		//│  └─ FAMS @spouse1@
+		//├─ SPOUSE_TO_FAMILY_LINK
+		//│  └─ FAMS @spouse2@
+		TreeIterator<GedcomNode> iterator = n.iterator(true);
+		int index = 0;
+		while (iterator.hasNext()) {
+			GedcomLine line = iterator.next().getNodeValue();
+			if (line.isTagLine()) {
+				GedcomTagLine tagLine = line.getAsTagLine();
+				
+				//Only count the tag lines with the given tag
+				if (tagLine.getTag().equals(tag)) {
+					if (offset <= index && tagLine.getValue().equals(value)) {
+						return index;
+					}
+						
+					index++;
+				}
+			}
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * Returns the index of the given XRef among the child lines with the given 
+	 * tag. Only tag lines are considered.
+	 * 
+	 * @param xref The XRef to look for
+	 * @param tag The lines to look for the XRef have to be of the tag line 
+	 * with this tag
+	 * @param path The path to look for the child XRef
+	 * @return The index if the XRef has been found, or <code>-1</code> if the 
+	 * XRef has not been found
+	 */
+	protected int indexOfChildXRef(String xref, String tag, String... path) {
+		return indexOfChildXRef(baseNode, xref, tag, 0, path);
+	}
+	
+	/**
+	 * Returns the index of the given XRef among the child lines with the given 
+	 * tag. Only tag lines are considered.
+	 * 
+	 * @param node The node to follow the path from
+	 * @param xref The XRef to look for
+	 * @param tag The lines to look for the XRef have to be of the tag line 
+	 * with this tag
+	 * @param offset The offset of the line to look for the XRef. Since it uses 
+	 * a iterator for searching, setting an offset still starts at the head of the 
+	 * sub tree but skips all occurrences until the index is greater or equal the offset.
+	 * @param path The path to look for the child XRef
+	 * @return The index if the XRef has been found, or <code>-1</code> if the 
+	 * XRef has not been found
+	 */
+	protected int indexOfChildXRef(GedcomNode node, String xref, String tag, 
+			int offset, String... path) {
+		GedcomNode n = node.followPath(path);
+		
+		//Use the iterator for the sub-tree of the current node since xrefs could 
+		//be nested under some structure lines. For example:
+		//├─ SPOUSE_TO_FAMILY_LINK
+		//│  └─ FAMS @spouse1@
+		//├─ SPOUSE_TO_FAMILY_LINK
+		//│  └─ FAMS @spouse2@
+		TreeIterator<GedcomNode> iterator = n.iterator(true);
+		int index = 0;
+		while (iterator.hasNext()) {
+			GedcomLine line = iterator.next().getNodeValue();
+			if (line.isTagLine()) {
+				GedcomTagLine tagLine = line.getAsTagLine();
+				
+				//Only count the tag lines with the given tag
+				if (tagLine.getTag().equals(tag)) {
+					if (offset <= index && tagLine.getXRef().equals(xref)) {
+						return index;
+					}
+						
+					index++;
+				}
+				
+			}
+		}
+		
+		return -1;
 	}
 	
 	/**

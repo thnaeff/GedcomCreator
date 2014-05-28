@@ -1032,29 +1032,44 @@ public class GedcomCreatorStructureStorage {
 	 */
 	public void cleanup() {
 		
-		Set<GedcomFamily> toRemove = new HashSet<>();
+		Set<GedcomFamily> familiesToRemove = new HashSet<>();
 		
 		for (GedcomFamily family : families.values()) {
-			String husbLink = family.getHusbandLink();
-			String wifeLink = family.getWifeLink();
+			String familyId = family.getId();
+			String husbId = family.getHusbandLink();
+			String wifeId = family.getWifeLink();
 			
-			boolean noHusbandLink = (husbLink == null || husbLink.length() == 0);
-			boolean noWifeLink = (wifeLink == null || wifeLink.length() == 0);
+			boolean noHusbandLink = (husbId == null || husbId.length() == 0);
+			boolean noWifeLink = (wifeId == null || wifeId.length() == 0);
 			boolean noChildLinks = (family.getNumberOfChildren() == 0);
 						
 			if (noHusbandLink && noWifeLink) {
 				//Family without parents
-				toRemove.add(family);
+				familiesToRemove.add(family);
+				
+				List<String> childIds = family.getChildLinks();
+				//Remove the family from all the children
+				for (String childId : childIds) {
+					individuals.get(childId).removeChildFamilyLink(familyId);
+				}
 			} else if (noChildLinks && (noWifeLink || noHusbandLink)) {
 				//Family with a single parent and no children
-				toRemove.add(family);
+				familiesToRemove.add(family);
+				
+				if (noHusbandLink) {
+					//Remove family from wife
+					individuals.get(wifeId).removeSpouseFamilyLink(familyId);
+				} else if (noWifeLink) {
+					//Remove family from husband
+					individuals.get(husbId).removeSpouseFamilyLink(familyId);
+				}
 			}
 			
 		}
 		
-		families.values().removeAll(toRemove);
+		families.values().removeAll(familiesToRemove);
 		
-		System.out.println("Cleanup: " + toRemove.size() + " families removed.");
+		System.out.println("Cleanup: " + familiesToRemove.size() + " families removed.");
 		
 	}
 	
