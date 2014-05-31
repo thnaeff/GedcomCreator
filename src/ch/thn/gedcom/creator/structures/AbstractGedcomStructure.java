@@ -24,7 +24,7 @@ import ch.thn.gedcom.data.GedcomTagLine;
 import ch.thn.gedcom.data.GedcomTree;
 import ch.thn.gedcom.data.GedcomNode.PathStepPieces;
 import ch.thn.gedcom.store.GedcomStore;
-import ch.thn.util.tree.core.TreeIterator;
+import ch.thn.util.tree.TreeIterator;
 
 /**
  * @author Thomas Naeff (github.com/thnaeff)
