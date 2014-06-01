@@ -74,7 +74,7 @@ public class GedcomCreatorStructureStorage {
 	/** Any families which are linked but do not exist. Only available after a call to {@link #buildFamilyRelations()} */
 	private ArrayList<String> missingFamilies = null;
 	
-	private boolean structuresModified = false;
+	private boolean structuresModified = true;
 	private boolean throwExceptionOnMissingStructures = false;
 	
 	/**
@@ -141,6 +141,8 @@ public class GedcomCreatorStructureStorage {
 		if (individual) {
 			individuals.putAll(structureStorage.getModifiableIndividuals());
 		}
+		
+		structuresModified = true;
 	}
 	
 	/**
@@ -1090,6 +1092,8 @@ public class GedcomCreatorStructureStorage {
 		}
 		
 		families.values().removeAll(familiesToRemove);
+		
+		structuresModified = true;
 		
 		System.out.println("Cleanup: " + familiesToRemove.size() + " families removed.");
 		
