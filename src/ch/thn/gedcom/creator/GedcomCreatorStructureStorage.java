@@ -311,18 +311,34 @@ public class GedcomCreatorStructureStorage {
 		String husbLink = family.getHusbandLink();
 		String wifeLink = family.getWifeLink();
 		
-		if (familiesOfParent.containsKey(husbLink) && familiesOfParent.containsKey(wifeLink)) {
-			if (getFamilyOfParents(husbLink, wifeLink) != null) {
+		if (!addFamilyForParents(husbLink, wifeLink, family)) {
+			return false;
+		}
+		
+		structuresModified = true;
+		putIfNotNull(families, familyId, family);
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param husbId
+	 * @param wifeId
+	 * @param family
+	 * @return
+	 */
+	private boolean addFamilyForParents(String husbId, String wifeId, GedcomFamily family) {
+		if (familiesOfParent.containsKey(husbId) && familiesOfParent.containsKey(wifeId)) {
+			if (getFamilyOfParents(husbId, wifeId) != null) {
 				//Both parents have a family already
 				return false;
 			}
 		}
 		
-		putIfNotNull(familiesOfParent, husbLink, family);
-		putIfNotNull(familiesOfParent, wifeLink, family);
-		
-		structuresModified = true;
-		putIfNotNull(families, familyId, family);
+		putIfNotNull(familiesOfParent, husbId, family);
+		putIfNotNull(familiesOfParent, wifeId, family);
 		
 		return true;
 	}
@@ -960,6 +976,10 @@ public class GedcomCreatorStructureStorage {
 	public void buildFamilyRelations() {
 		clearFamilyRelations();
 		
+		//Set this flag at the beginning so that calls to other methods in this 
+		//class do not trigger a family relations update
+		structuresModified = false;
+		
 		for (GedcomIndividual indi : individuals.values()) {
 			
 			//--- missingFamilies
@@ -997,8 +1017,7 @@ public class GedcomCreatorStructureStorage {
 			String wifeLink = fam.getWifeLink();
 			
 			//--- familiesOfParent
-			putIfNotNull(familiesOfParent, husbLink, fam);
-			putIfNotNull(familiesOfParent, wifeLink, fam);
+			addFamilyForParents(husbLink, wifeLink, fam);
 			
 			//--- partnersOfIndividual
 			//--- missingIndividuals
@@ -1045,8 +1064,6 @@ public class GedcomCreatorStructureStorage {
 			
 			
 		}
-		
-		structuresModified = false;
 		
 	}
 	
