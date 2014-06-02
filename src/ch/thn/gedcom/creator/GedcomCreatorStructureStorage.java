@@ -330,15 +330,21 @@ public class GedcomCreatorStructureStorage {
 	 * @return
 	 */
 	private boolean addFamilyForParents(String husbId, String wifeId, GedcomFamily family) {
+		if (husbId == null && wifeId == null) {
+			return false;
+		}
+		
 		if (familiesOfParent.containsKey(husbId) && familiesOfParent.containsKey(wifeId)) {
 			if (getFamilyOfParents(husbId, wifeId) != null) {
-				//Both parents have a family already
+				//They have a family already
 				return false;
 			}
 		}
 		
-		putIfNotNull(familiesOfParent, husbId, family);
-		putIfNotNull(familiesOfParent, wifeId, family);
+		//Add all families. Also the ones where one spouse is NULL
+		
+		familiesOfParent.put(husbId, family);
+		familiesOfParent.put(wifeId, family);
 		
 		return true;
 	}
@@ -835,6 +841,10 @@ public class GedcomCreatorStructureStorage {
 	public GedcomFamily getFamilyOfParents(String parent1Id, String parent2Id) {
 		if (structuresModified) {
 			buildFamilyRelations();
+		}
+		
+		if (parent1Id == null && parent2Id == null) {
+			return null;
 		}
 		
 		Set<GedcomFamily> families1 = getFamiliesOfParent(parent1Id);
