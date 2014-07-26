@@ -1,14 +1,15 @@
 # GedcomCreator
-**A library to easily create basic [GEDCOM](http://en.wikipedia.org/wiki/GEDCOM)-structures. Those structures can then also be used to create more complex structures if needed -> it serves as a great starting point to set up a structure.**
+**A library to easily create basic [GEDCOM](http://en.wikipedia.org/wiki/GEDCOM)-structures. Those structures can then also be used to create more complex structures if needed.**
 
-GedcomCreator uses the [GedcomStore](https://github.com/thnaeff/GedcomStore) library to create the GEDCOM structures. GedcomCreator, however, provides some basic classes and methods to get started on setting up the structures. The library comes with classes for:
-* The header structure HEADER `GedcomCreatorHeader`
-* The submitter record SUBMITTER_RECORD `GedcomCreatorSubmitter`
-* The family record FAM_RECORD `GedcomCreatorFamily`
-* The individual record INDIVIDUAL_RECORD `GedcomCreatorIndividual`
-* The end-of-file line TRLR `GedcomCreatorEOF`
+GedcomCreator uses the [GedcomStore](https://github.com/thnaeff/GedcomStore) library to create the GEDCOM structures. GedcomCreator provides some basic classes and methods to get started on setting up the structures. The library comes with classes for:
 
-Those classes have methods implemented which will help with the most common situations in creating a GEDCOM structure. The `GedcomCreatorIndividual` class for example has methods to set the gender, birth date, death date, address etc. of an individual. Since the GedcomCreator depends on the GedcomStore library, each structure class needs a GedcomStore instance in the constructor.
+* The header structure HEADER `GedcomHeader`
+* The submitter record SUBMITTER_RECORD `GedcomSubmitter`
+* The family record FAM_RECORD `GedcomFamily`
+* The individual record INDIVIDUAL_RECORD `GedcomIndividual`
+* The end-of-file line TRLR `GedcomEOF`
+
+Those classes have methods implemented which will help with the most common situations in creating a GEDCOM structure. The `GedcomIndividual` class for example has methods to set the gender, birth date, death date, address etc. of an individual. Since the GedcomCreator depends on the GedcomStore library, each structure class needs a GedcomStore instance in the constructor.
 
 The GedcomCreator is made for the GEDCOM specifications version 5.5 and 5.5.1. gedg files for both versions are included in the [GedcomStore](https://github.com/thnaeff/GedcomStore).
 
@@ -28,7 +29,7 @@ try {
 }
 
 
-GedcomCreatorIndividual indi = new GedcomCreatorIndividual(store, "1");
+GedcomIndividual indi = new GedcomIndividual(store, "1");
 indi.setSex(Sex.MALE);
 indi.setBirth(true, new Date());
 indi.setDeath(true, new Date());
@@ -47,11 +48,11 @@ indi.setChangeDate(new Date());
 
 GedcomStructureTextPrinter textPrinter = new GedcomStructureTextPrinter();
 
-System.out.println(textPrinter.print(indi.getNode()));
+System.out.println(textPrinter.print(indi.getTree()));
 
 System.out.println("------");
 
-GedcomCreatorFamily fam = new GedcomCreatorFamily(store, "1");
+GedcomFamily fam = new GedcomFamily(store, "1");
 fam.setHusbandLink("1");
 fam.setWifeLink("2");
 fam.addChildLink("3");
@@ -61,7 +62,7 @@ fam.setDivorced(true, null);
 fam.addNote("A Family Note");
 fam.setChangeDate(new Date());
 
-System.out.println(textPrinter.print(fam.getNode()));	
+System.out.println(textPrinter.print(fam.getTree()));	
 ```
 
 The output of this example code is:
@@ -118,9 +119,43 @@ The output of this example code is:
   1 NOTE A Family Note
 ```
 
+##Printing
+As shown in the example above, a GedcomCreator structure can be printed using any of the `GedcomStructure*` printers (`GedcomStructureTextPrinter` for example) located in the GedcomStore. The internal node of the `GedcomCreator` structure tree has to be passed to the printer for printing.
+
+
+
+##Access to the complete GEDCOM structure
+The internal GEDCOM structure tree can be accessed for more advanced structure modifications. As the example above shows, each `GedcomCreator` structure has the `getTree()` method which returns the internal GEDCOM structure tree (a `GedcomNode` from the `GedcomStore`). See [GedcomStore](https://github.com/thnaeff/GedcomStore) for more information.
+
+
+
+****************************************************************************
+
+
+
+#Family Relations (GedcomCreatorStructureStorage)
+The class `GedcomCreatorStructureStorage` serves three purposes:
+
+* As a easy place to collect all `GedcomCreator` structures (`GedcomFamily`, `GedcomIndividual`, ...)
+* To collect family relation informations (children/partners on an individual, families of a parent/child, ...)
+* To locate missing individuals or families which are linked but not present
+
+Just add all `GedcomCreator` structures to a `GedcomCreatorStructureStorage` instance and call the `buildFamilyRelations()` to build the family relations and locate any missing structures. The following methods can then be used for family relations:
+
+* getChildrenOfIndividual: Returs all the children of the given individual
+* getFamiliesOfParent: Returns all the families the given individual is a parent of
+* getFamilyOfParents: Returns the family of which the two given individuals are the parents of
+* getMissingFamilies: Returns a list of all the family link ID's which are given in individuals but which are not found as family
+* getMissingIndividuals: Returns a list of all the individual link ID's which are given in families but which are not found as individual
+
+Whenever new `GedcomCreator` structures are added/removed to a `GedcomCreatorStructureStorage`, the `buildFamilyRelations()` method has to be called again to update the family relations. However, if any of the get-method above is called and there are any changes, the `buildFamilyRelations()` method is called automatically before the get-method returns its result.
+
+
+****************************************************************************
+
 
 # Dependencies
 * [GedcomStore](https://github.com/thnaeff/GedcomStore)
-* [Joda-Time](http://http://www.joda.org) (GedcomStore needs this)
+* [Joda-Time](http://http://www.joda.org) (dependency of GedcomStore)
 * My own utility library: [Util](http://github.com/thnaeff/Util)
 
