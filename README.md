@@ -1,6 +1,16 @@
 # GedcomCreator
 **A library to easily create basic [GEDCOM](http://en.wikipedia.org/wiki/GEDCOM)-structures. Those structures can then also be used to create more complex structures if needed.**
 
+---
+
+
+[![License](http://img.shields.io/badge/License-Apache v2.0-802879.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Java Version](http://img.shields.io/badge/Java-1.6%2B-2E6CB8.svg)](https://java.com)
+[![Apache Maven ready](http://img.shields.io/badge/Apache Maven ready-3.3.9%2B-FF6804.svg)](https://maven.apache.org/)
+
+
+---
+
 GedcomCreator uses the [GedcomStore](https://github.com/thnaeff/GedcomStore) library to create the GEDCOM structures. GedcomCreator provides some basic classes and methods to get started on setting up the structures. The library comes with classes for:
 
 * The header structure HEADER `GedcomHeader`
@@ -154,8 +164,26 @@ Whenever new `GedcomCreator` structures are added/removed to a `GedcomCreatorStr
 ****************************************************************************
 
 
-# Dependencies
-* [GedcomStore](https://github.com/thnaeff/GedcomStore)
-* [Joda-Time](http://http://www.joda.org) (dependency of GedcomStore)
-* My own utility library: [Util](http://github.com/thnaeff/Util)
 
+---
+
+
+<img src="http://maven.apache.org/images/maven-logo-black-on-white.png" alt="Built with Maven" width="150">
+
+This project can be built with Maven
+
+Maven command:
+```
+$ mvn clean install
+```
+
+pom.xml entry in your project:
+```
+<dependency>
+	<groupId>ch.thn.gedcom</groupId>
+	<artifactId>creator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+---

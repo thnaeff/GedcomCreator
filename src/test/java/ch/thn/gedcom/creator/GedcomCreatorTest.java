@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package ch.thn.gedcom.creator.test;
+package ch.thn.gedcom.creator;
 
 import java.util.Date;
 
